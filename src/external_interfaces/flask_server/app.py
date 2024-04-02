@@ -4,6 +4,11 @@ from flask import Flask
 
 from src.external_interfaces.flask_server.routers import arxiv_document
 from src.external_interfaces.flask_server.routers import home
+from src.external_interfaces.flask_server.routers.motor import (
+    policys,
+    layers,
+    rules
+)
 from src.external_interfaces.flask_server.settings import DevConfig
 
 from flask_openapi3 import OpenAPI, Info
@@ -29,5 +34,8 @@ def create_app(config_object=DevConfig):
 
     app.register_api(arxiv_document.blueprint)
     app.register_api(home.blueprint)
+    app.register_api(policys.blueprint)
+    app.register_api(rules.blueprint)
+    app.register_api(layers.blueprint)
 
     return app
