@@ -1,0 +1,10 @@
+{
+    "motor": {
+        "dialect": "sqlite",
+        "username": null,
+        "password": null,
+        "host": null,
+        "port": null,
+        "database": "files/database/db.sqlite3"
+    }
+}
