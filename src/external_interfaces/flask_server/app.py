@@ -7,7 +7,8 @@ from src.external_interfaces.flask_server.routers import home
 from src.external_interfaces.flask_server.routers.motor import (
     policys,
     layers,
-    rules
+    rules,
+    association
 )
 from src.external_interfaces.flask_server.settings import DevConfig
 
@@ -37,5 +38,6 @@ def create_app(config_object=DevConfig):
     app.register_api(policys.blueprint)
     app.register_api(rules.blueprint)
     app.register_api(layers.blueprint)
+    app.register_api(association.blueprint)
 
     return app
