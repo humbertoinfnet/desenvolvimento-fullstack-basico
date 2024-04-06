@@ -6,8 +6,7 @@ from pydantic import BaseModel, Field
 from flask import request, Response
 from flask_openapi3 import Tag, APIBlueprint
 
-
-
+from src.external_interfaces.database.controllers.motor import Motor
 from src.interface_adapters.request_arxiv.rest_adapters import request_object as res
 
 
@@ -27,52 +26,28 @@ class Path(BaseModel):
     policy_id: int = Field(..., description='Policy id')
 
 class PolicyBody(BaseModel):
-    name: Optional[str] = Field(None, description='Nome da regra')
-    type: Optional[str] = Field(None, description='Lógica da regra')
-    description: Optional[str] = Field(None, description='Descrição da regra')
+    name: Optional[str] = Field(None, description='Nome da política')
+    description: Optional[str] = Field(None, description='Descrição da política')
 
-
-policys = [
-    {
-        'id': 0,
-        'name': 'CARTAO_PJ',
-        'type': 'policy',
-        'description': 'Política de Cartão para documentos PJ'
-    },
-    {
-        'id': 1,
-        'name': 'CARTAO_PF',
-        'type': 'policy',
-        'description': 'Política de Cartão para documentos PF'
-    },
-    {
-        'id': 2,
-        'name': 'ANTECIPACAO_CEDENTE',
-        'type': 'policy',
-        'description': 'Política de Cedente para o produto antecipação de recebíveis '
-    }
-    
-]
 
 @blueprint.get('/policys')
 def get_policys():
     """
-    Rota GET para acessar as políticas e camadas cadastradas
+    Rota GET para acessar todas as Políticas
     """
 
-    try:         
+    motor = Motor()
+    policys = motor.get_all_policys().to_dict(orient='records')
+    try:          
         return Response(
-            json.dumps(policys),
+            json.dumps(policys, ensure_ascii=False),
             mimetype="application/json",
             status=200,
-        )        
+        )
+        
     except:
         return Response(
-            json.dumps(
-                {
-                    'msg': 'erro',
-                }
-            ),
+            json.dumps({'msg': 'erro'}),
             mimetype="application/json",
             status=500,
         )
@@ -80,15 +55,12 @@ def get_policys():
 @blueprint.get('/policy/<int:policy_id>')
 def get_policy_by_id(path: Path):
     """
-    Rota GET para acessar as Politicas cadastradas por id
+    Rota GET para acessar as Politicas por id
     """
+    motor = Motor()
+    policy = motor.get_policys_by_id([path.policy_id]).to_dict(orient='records')
     return Response(
-        json.dumps(
-            {
-                'msg': 'Policy',
-                'policy': policys[path.policy_id]
-            }
-        ),
+        json.dumps(policy, ensure_ascii=False),
         mimetype="application/json",
         status=200,
     )
@@ -96,33 +68,83 @@ def get_policy_by_id(path: Path):
 @blueprint.delete('/policy/<int:policy_id>')
 def delete_policy_by_id(path: Path):
     """
-    Rota DELETE para deletar as Politicas cadastradas por id
+    Rota DELETE das Políticas por id
     """
+    motor = Motor()
+    policy = motor.get_policys_by_id([path.policy_id])
+    if len(policy):
+        data_update = [{'id': path.policy_id, 'status': 'inactive'}]
+        motor.update_item('policys', data_update)
+        return Response(
+            json.dumps(
+                {
+                    'msg': 'Política deletada com sucesso',
+                    'deleted': policy.to_dict(orient='records')
+                },
+                ensure_ascii=False
+            ),
+            mimetype="application/json",
+            status=200,
+        )
+    return Response(
+        json.dumps(
+            {'msg': 'Não existe política para os parâmetros informados'},
+            ensure_ascii=False
+        ),
+        mimetype="application/json",
+        status=422,
+    )
+
+@blueprint.put('/policy/<int:policy_id>')
+def update_policy(path: Path, query: PolicyBody):
+    """
+    Rota PUT para atualização de Politica por id
+    """
+    motor = Motor()
+    previous_policy = motor.get_policys_by_id([path.policy_id])
+    if len(previous_policy):
+        data_update = {key: value for key, value in query.model_dump().items() if value is not None}
+        data_update['id'] = path.policy_id
+        motor.update_item('policys', [data_update])
+        updated_policy = motor.get_policys_by_id([path.policy_id])
+        return Response(
+            json.dumps(
+                {
+                    'msg': 'Política atualizada com sucesso',
+                    'previous': previous_policy.to_dict(orient='records'),
+                    'updated': updated_policy.to_dict(orient='records')
+                },
+                ensure_ascii=False
+            ),
+            mimetype="application/json",
+            status=200,
+        )
+    return Response(
+        json.dumps(
+            {'msg': 'Não existe política para os parâmetros informados'},
+            ensure_ascii=False
+        ),
+        mimetype="application/json",
+        status=422,
+    )
+
+@blueprint.post('/policy')
+def add_policy(body: PolicyBody):
+    """
+    Rota POST para adicionar Nova Politica
+    """
+    motor = Motor()
+    data_save = body.model_dump().copy()
+    data_save['id'] = None
+    motor.add_item('policys', [data_save])
     return Response(
         json.dumps(
             {
-                'msg': 'Policy',
-                'policy': policys[path.policy_id]
-            }
+                "message": "Política inserida com sucesso",
+                "policy": body.model_dump()
+            }, 
+            ensure_ascii=False
         ),
         mimetype="application/json",
         status=200,
     )
-
-@blueprint.put('/policys/<int:policy_id>')
-def update_policy(path: Path, query: PolicyBody):
-    """
-    Rota para atualização de Politica
-    """
-    for key, value in query.model_dump().items():
-        if value is not None:
-            policys[path.policy_id][key] = value
-    return json.dumps(policys[path.policy_id], ensure_ascii=False)
-
-@blueprint.post('/policys')
-def add_policy(body: PolicyBody):
-    """
-    Rota para adicionar Nova Politica
-    """
-    policys.append(body.model_dump())
-    return json.dumps({"message": "ok", "policy": body.model_dump()}, ensure_ascii=False)

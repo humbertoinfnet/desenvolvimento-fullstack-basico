@@ -6,9 +6,8 @@ from pydantic import BaseModel, Field
 from flask import request, Response
 from flask_openapi3 import Tag, APIBlueprint
 
-
-
 from src.interface_adapters.request_arxiv.rest_adapters import request_object as res
+from src.external_interfaces.database.controllers.motor import Motor
 
 
 tag = Tag(name="Camadas", description="Camadas")
@@ -25,47 +24,24 @@ class BookQuery(BaseModel):
 class Path(BaseModel):
     layer_id: int = Field(..., description='layer id')
 
-class layerBody(BaseModel):
-    name: Optional[str] = Field(None, description='Nome da regra')
-    type: Optional[str] = Field(None, description='Lógica da regra')
-    description: Optional[str] = Field(None, description='Descrição da regra')
+class LayerBody(BaseModel):
+    name: Optional[str] = Field(None, description='Nome da camada')
+    description: Optional[str] = Field(None, description='Descrição da camada')    
 
-
-layers = [
-    {
-        'id': 0,
-        'name': 'layer_0',
-        'type': 'layer',
-        'description': 'Camada dos filtros duros para informações internas não pagas'
-    },
-    {
-        'id': 1,
-        'name': 'layer_1',
-        'type': 'layer',
-        'description': 'Camada de filtro duro para informações pagas até 1 real'
-    },
-    {
-        'id': 2,
-        'name': 'layer_2',
-        'type': 'layer',
-        'description': 'Camada de filtro duro para informações pagas de 1 real até 2 reais'
-    }
-    
-]
 
 @blueprint.get('/layers')
 def get_layers():
     """
-    Rota GET para acessar as Camadas e layers cadastradas
+    Rota GET para acessar todas as Camadas
     """
-
+    motor = Motor()
+    layers = motor.get_all_layers().to_dict(orient='records')
     try:          
         return Response(
             json.dumps(layers, ensure_ascii=False),
             mimetype="application/json",
             status=200,
         )
-        
     except:
         return Response(
             json.dumps(
@@ -80,10 +56,12 @@ def get_layers():
 @blueprint.get('/layer/<int:layer_id>')
 def get_layer_by_id(path: Path):
     """
-    Rota GET para acessar as Camadas cadastradas por id
+    Rota GET para acessar as Camadas por id
     """
+    motor = Motor()
+    layer = motor.get_layers_by_id([path.layer_id]).to_dict(orient='records')
     return Response(
-        json.dumps(layers[path.layer_id], ensure_ascii=False),
+        json.dumps(layer, ensure_ascii=False),
         mimetype="application/json",
         status=200,
     )
@@ -91,80 +69,80 @@ def get_layer_by_id(path: Path):
 @blueprint.delete('/layer/<int:layer_id>')
 def delete_layer_by_id(path: Path):
     """
-    Rota DELETE para deletar as Camadas cadastradas por id
+    Rota DELETE das Camadas por id
     """
+    motor = Motor()
+    layer = motor.get_layers_by_id([path.layer_id])
+    if len(layer):
+        data_update = [{'id': path.layer_id, 'status': 'inactive'}]
+        motor.update_item('layers', data_update)
+        return Response(
+            json.dumps(
+                {
+                    'msg': 'Camada deletada com sucesso',
+                    'deleted': layer.to_dict(orient='records')
+                },
+                ensure_ascii=False
+            ),
+            mimetype="application/json",
+            status=200,
+        )
     return Response(
         json.dumps(
-            {
-                'msg': 'Camada deletada com sucesso',
-                'layer': layers[path.layer_id]
-            },
+            {'msg': 'Não existe camada para os parâmetros informados'},
             ensure_ascii=False
         ),
         mimetype="application/json",
-        status=200,
+        status=422,
     )
 
-@blueprint.put('/layers/<int:layer_id>')
-def update_layer(path: Path, query: layerBody):
+@blueprint.put('/layer/<int:layer_id>')
+def update_layer(path: Path, query: LayerBody):
     """
-    Rota para atualização de Camada
+    Rota PUT para atualização de Camada por id
     """
-    for key, value in query.model_dump().items():
-        if value is not None:
-            layers[path.layer_id][key] = value
+    motor = Motor()
+    previous_layer = motor.get_layers_by_id([path.layer_id])
+    if len(previous_layer):
+        data_update = {key: value for key, value in query.model_dump().items() if value is not None}
+        data_update['id'] = path.layer_id
+        motor.update_item('layers', [data_update])
+        updated_layer = motor.get_layers_by_id([path.layer_id])
+        return Response(
+            json.dumps(
+                {
+                    'msg': 'Camada atualizada com sucesso',
+                    'previous': previous_layer.to_dict(orient='records'),
+                    'updated': updated_layer.to_dict(orient='records')
+                },
+                ensure_ascii=False
+            ),
+            mimetype="application/json",
+            status=200,
+        )
     return Response(
-        json.dumps(layers[path.layer_id], ensure_ascii=False),
+        json.dumps(
+            {'msg': 'Não existe camada para os parâmetros informados'},
+            ensure_ascii=False
+        ),
         mimetype="application/json",
-        status=200,
+        status=422,
     )
 
-@blueprint.post('/layers')
-def add_layer(body: layerBody):
+@blueprint.post('/layer')
+def add_layer(body: LayerBody):
     """
-    Rota para adicionar Nova Camada
+    Rota POST para adicionar Nova Camada
     """
-    layers.append(body.model_dump())
+    motor = Motor()
+    data_save = body.model_dump().copy()
+    data_save['id'] = None
+    motor.add_item('layers', [data_save])
     return Response(
         json.dumps(
             {"message": "Camada inserida com sucesso",
             "layer": body.model_dump()
             }, 
-            ensure_ascii=False
-        ),
-        mimetype="application/json",
-        status=200,
-    )
-
-@blueprint.post('/associate-layers-to-polices')
-def associate_layers_to_polices(query: Query):
-    """
-    Rota para associar camada com politica
-    """
-    
-    return Response(
-        json.dumps(
-            {"message": "Camada associada com sucesso",
-            "associate": f"{layers[query.origin_id]['name']} com Política {query.destino_id}"
-            }, 
-            ensure_ascii=False
-        ),
-        mimetype="application/json",
-        status=200,
-    )
-
-
-@blueprint.post('/associate-rules-to-layers')
-def associate_rules_to_layers(query: Query):
-    """
-    Rota para associar regra com camada
-    """
-    
-    return Response(
-        json.dumps(
-            {"message": "Camada associada com sucesso",
-            "associate": f"Regra {query.origin_id} com Camada {layers[query.destino_id]['name']}"
-            },  
             ensure_ascii=False
         ),
         mimetype="application/json",

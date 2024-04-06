@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from flask import request, Response
 from flask_openapi3 import Tag, APIBlueprint
 
+from src.external_interfaces.database.controllers.motor import Motor
 from src.interface_adapters.request_arxiv.rest_adapters import request_object as res
 
 
@@ -22,112 +23,126 @@ class Path(BaseModel):
 
 class RuleBody(BaseModel):
     name: Optional[str] = Field(None, description='Nome da regra')
+    code: Optional[str] = Field(None, description='Código da regra')
     rule: Optional[str] = Field(None, description='Lógica da regra')
     description: Optional[str] = Field(None, description='Descrição da regra')
 
 
-rules = [
-    {
-        'id': 0,
-        'name': 'PF_REP001-TempoConta',
-        'code': 'REP001',
-        'type': 'rule',
-        'rule': 'TempoConta > 30',
-        'descrição': 'Regra de PF para tempo de conta mínimo em dias'
-    },
-    {
-        'id': 1,
-        'name': 'PF_REP002-Idade',
-        'code': 'REP002',
-        'type': 'rule',
-        'rule': 'Idade >= 18 and Idade < 90',
-        'descrição': 'Regra de PF para idade no intervalo de 18 a 90'
-    },
-    {
-        'id': 2,
-        'name': 'PF_REP003-ScoreSerasa',
-        'code': 'REP003',
-        'type': 'rule',
-        'rule': 'ScoreSerasa > 500',
-        'descrição': 'Regra de PF para score serasa maior que 500'
-    },
-    
-]
-
-
 @blueprint.get('/rules')
-def get_rules(query: BookQuery):
+def get_rules():
     """
-    Rota GET para acessar todas as regras cadastradas
+    Rota GET para acessar todas as Regras
     """
 
-    try:
-        if query.type == 'rules':
-            return Response(
-                json.dumps(rules),
-                mimetype="application/json",
-                status=200,
-            )
-
+    motor = Motor()
+    rules = motor.get_all_rules().to_dict(orient='records')
+    try:          
+        return Response(
+            json.dumps(rules, ensure_ascii=False),
+            mimetype="application/json",
+            status=200,
+        )
+        
     except:
         return Response(
-            json.dumps(
-                {
-                    'msg': 'erro',
-                }
-            ),
+            json.dumps({'msg': 'erro'}),
             mimetype="application/json",
             status=500,
         )
 
-
-@blueprint.get('/rules/<int:rule_id>')
+@blueprint.get('/rule/<int:rule_id>')
 def get_rule_by_id(path: Path):
     """
-    Rota GET para acessar as regras cadastradas por id
+    Rota GET para acessar as Regras por id
     """
+    motor = Motor()
+    rule = motor.get_rules_by_id([path.rule_id]).to_dict(orient='records')
     return Response(
-        json.dumps(rules[path.rule_id]),
+        json.dumps(rule, ensure_ascii=False),
         mimetype="application/json",
         status=200,
     )
 
-
-@blueprint.delete('/rules/<int:rule_id>')
+@blueprint.delete('/rule/<int:rule_id>')
 def delete_rule_by_id(path: Path):
     """
-    Rota DELETE para excluir regras
+    Rota DELETE das Regras por id
     """
+    motor = Motor()
+    rule = motor.get_rules_by_id([path.rule_id])
+    if len(rule):
+        data_update = [{'id': path.rule_id, 'status': 'inactive'}]
+        motor.update_item('rules', data_update)
+        return Response(
+            json.dumps(
+                {
+                    'msg': 'Regras deletada com sucesso',
+                    'deleted': rule.to_dict(orient='records')
+                },
+                ensure_ascii=False
+            ),
+            mimetype="application/json",
+            status=200,
+        )
     return Response(
-        json.dumps(rules[path.rule_id]),
+        json.dumps(
+            {'msg': 'Não existe regra para os parâmetros informados'},
+            ensure_ascii=False
+        ),
         mimetype="application/json",
-        status=200,
+        status=422,
     )
 
-
-@blueprint.put('/rules/<int:rule_id>')
+@blueprint.put('/rule/<int:rule_id>')
 def update_rule(path: Path, query: RuleBody):
     """
-    Rota para atualização de regra
+    Rota PUT para atualização de Regra por id
     """
-    for key, value in query.model_dump().items():
-        if value is not None:
-            rules[path.rule_id][key] = value
+    motor = Motor()
+    previous_rule = motor.get_rules_by_id([path.rule_id])
+    if len(previous_rule):
+        data_update = {key: value for key, value in query.model_dump().items() if value is not None}
+        data_update['id'] = path.rule_id
+        motor.update_item('rules', [data_update])
+        updated_rule = motor.get_rules_by_id([path.rule_id])
+        return Response(
+            json.dumps(
+                {
+                    'msg': 'Regra atualizada com sucesso',
+                    'previous': previous_rule.to_dict(orient='records'),
+                    'updated': updated_rule.to_dict(orient='records')
+                },
+                ensure_ascii=False
+            ),
+            mimetype="application/json",
+            status=200,
+        )
     return Response(
-        json.dumps(rules[path.rule_id], ensure_ascii=False),
+        json.dumps(
+            {'msg': 'Não existe regra para os parâmetros informados'},
+            ensure_ascii=False
+        ),
         mimetype="application/json",
-        status=200,
+        status=422,
     )
 
-
-@blueprint.post('/rules')
-def add_policy(body: RuleBody):
+@blueprint.post('/rule')
+def add_rule(body: RuleBody):
     """
-    Rota para adicionar Nova Regra
+    Rota POST para adicionar Nova Regra
     """
-    rules.append(body.model_dump())
+    motor = Motor()
+    data_save = body.model_dump().copy()
+    data_save['id'] = None
+    motor.add_item('rules', [data_save])
     return Response(
-        json.dumps(body.model_dump(), ensure_ascii=False),
+        json.dumps(
+            {
+                "message": "Regra inserida com sucesso",
+                "rule": body.model_dump()
+            }, 
+            ensure_ascii=False
+        ),
         mimetype="application/json",
         status=200,
     )
