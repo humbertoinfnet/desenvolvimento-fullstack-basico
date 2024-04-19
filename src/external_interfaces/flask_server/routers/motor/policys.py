@@ -1,85 +1,100 @@
-import json
-
-from typing import Optional
-from pydantic import BaseModel, Field
-
-from flask import request, Response
+from flask import request, Response, current_app, json
 from flask_openapi3 import Tag, APIBlueprint
 
 from src.external_interfaces.database.controllers.motor import Motor
-from src.interface_adapters.request_arxiv.rest_adapters import request_object as res
+from src.use_cases.motor import MotorConfig, UpdateAssociation
+from src.interface_adapters.schemas.motor.policys import (
+    BodyPolicy,
+    PathPolicy,
+    ResponseSuccessPolicy,
+    ResponseSuccessPolicyAdd,
+    ResponseSuccessPolicyDelete,
+    ResponseSuccessPolicyUpdate
+)
+from src.interface_adapters.schemas.response import (
+    ResponseError,
+    ResponseSuccess,
+    ResponseNoContent
+)
+
+tag = Tag(name="Politicas", description="Rotas para controle das Políticas")
+blueprint = APIBlueprint(
+    'politicas',
+    __name__,
+    abp_tags=[tag],
+    doc_ui=True,
+    abp_responses={
+        200: ResponseSuccess,
+        204: ResponseNoContent,
+        500: ResponseError
+    }
+)
 
 
-tag = Tag(name="Politicas", description="Politicas")
-blueprint = APIBlueprint('politicas', __name__, abp_tags=[tag], doc_ui=True)
-
-
-class BookBody(BaseModel):
-    age: Optional[int] = Field(..., ge=2, le=4, description='Age')
-    author: str = Field(None, min_length=2, max_length=4, description='Author')
-
-
-class BookQuery(BaseModel):
-    type: str
-
-class Path(BaseModel):
-    policy_id: int = Field(..., description='Policy id')
-
-class PolicyBody(BaseModel):
-    name: Optional[str] = Field(None, description='Nome da política')
-    description: Optional[str] = Field(None, description='Descrição da política')
-
-
-@blueprint.get('/policys')
+@blueprint.get(
+    '/policys',
+    responses={200: ResponseSuccessPolicy}
+)
 def get_policys():
     """
     Rota GET para acessar todas as Políticas
     """
 
+    current_app.logger.info('[route-layers] - acessa a rota GET /layers')
     motor = Motor()
-    policys = motor.get_all_policys().to_dict(orient='records')
-    try:          
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    policys = motor_config.policys.get_policys()
+    return Response(
+        json.dumps(policys, ensure_ascii=False),
+        mimetype="application/json",
+        status=200,
+    )
+
+@blueprint.get(
+    '/policy/<int:policy_id>',
+    responses={200: ResponseSuccessPolicy}
+)
+def get_policy_by_id(path: PathPolicy):
+    """
+    Rota GET para acessar as Politicas por id
+    """
+
+    current_app.logger.info('[route-layers] - acessa a rota /layers')
+    motor = Motor()
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    policys = motor_config.policys.get_policy_by_id(path.policy_id)
+    if len(policys):
         return Response(
             json.dumps(policys, ensure_ascii=False),
             mimetype="application/json",
             status=200,
         )
-        
-    except:
-        return Response(
-            json.dumps({'msg': 'erro'}),
-            mimetype="application/json",
-            status=500,
-        )
-
-@blueprint.get('/policy/<int:policy_id>')
-def get_policy_by_id(path: Path):
-    """
-    Rota GET para acessar as Politicas por id
-    """
-    motor = Motor()
-    policy = motor.get_policys_by_id([path.policy_id]).to_dict(orient='records')
     return Response(
-        json.dumps(policy, ensure_ascii=False),
         mimetype="application/json",
-        status=200,
+        status=204,
     )
 
-@blueprint.delete('/policy/<int:policy_id>')
-def delete_policy_by_id(path: Path):
+@blueprint.delete(
+    '/policy/<int:policy_id>',
+    responses={200: ResponseSuccessPolicyDelete}
+)
+def delete_policy_by_id(path: PathPolicy):
     """
     Rota DELETE das Políticas por id
     """
+
     motor = Motor()
-    policy = motor.get_policys_by_id([path.policy_id])
-    if len(policy):
-        data_update = [{'id': path.policy_id, 'status': 'inactive'}]
-        motor.update_item('policys', data_update)
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    deleted = motor_config.policys.delete_policy(path.policy_id)
+    if len(deleted):
         return Response(
             json.dumps(
                 {
-                    'msg': 'Política deletada com sucesso',
-                    'deleted': policy.to_dict(orient='records')
+                    'message': 'success_deleted',
+                    'deleted': deleted
                 },
                 ensure_ascii=False
             ),
@@ -87,32 +102,34 @@ def delete_policy_by_id(path: Path):
             status=200,
         )
     return Response(
-        json.dumps(
-            {'msg': 'Não existe política para os parâmetros informados'},
-            ensure_ascii=False
-        ),
         mimetype="application/json",
-        status=422,
+        status=204,
     )
 
-@blueprint.put('/policy/<int:policy_id>')
-def update_policy(path: Path, query: PolicyBody):
+@blueprint.put(
+    '/policy/<int:policy_id>',
+    responses={200: ResponseSuccessPolicyUpdate}
+)
+def update_policy(path: PathPolicy, query: BodyPolicy):
     """
     Rota PUT para atualização de Politica por id
     """
+
     motor = Motor()
-    previous_policy = motor.get_policys_by_id([path.policy_id])
-    if len(previous_policy):
-        data_update = {key: value for key, value in query.model_dump().items() if value is not None}
-        data_update['id'] = path.policy_id
-        motor.update_item('policys', [data_update])
-        updated_policy = motor.get_policys_by_id([path.policy_id])
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    previous_policys, updated_policys = (
+        motor_config
+        .policys
+        .update_policy(path.policy_id, query.model_dump())
+    )
+    if len(previous_policys):
         return Response(
             json.dumps(
                 {
-                    'msg': 'Política atualizada com sucesso',
-                    'previous': previous_policy.to_dict(orient='records'),
-                    'updated': updated_policy.to_dict(orient='records')
+                    'message': 'success_updated',
+                    'previous': previous_policys,
+                    'updated': updated_policys
                 },
                 ensure_ascii=False
             ),
@@ -120,28 +137,28 @@ def update_policy(path: Path, query: PolicyBody):
             status=200,
         )
     return Response(
-        json.dumps(
-            {'msg': 'Não existe política para os parâmetros informados'},
-            ensure_ascii=False
-        ),
         mimetype="application/json",
-        status=422,
+        status=204,
     )
 
-@blueprint.post('/policy')
-def add_policy(body: PolicyBody):
+@blueprint.post(
+    '/policy',
+    responses={200: ResponseSuccessPolicyAdd}
+)
+def add_policy(body: BodyPolicy):
     """
     Rota POST para adicionar Nova Politica
     """
+
     motor = Motor()
-    data_save = body.model_dump().copy()
-    data_save['id'] = None
-    motor.add_item('policys', [data_save])
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    policy_create = motor_config.policys.add_policy(body)
     return Response(
         json.dumps(
             {
-                "message": "Política inserida com sucesso",
-                "policy": body.model_dump()
+                "message": "success_add",
+                "create": policy_create
             }, 
             ensure_ascii=False
         ),

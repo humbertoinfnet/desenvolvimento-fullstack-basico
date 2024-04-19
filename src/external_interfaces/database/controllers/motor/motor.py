@@ -1,8 +1,7 @@
-from abc import abstractclassmethod
 from typing import Literal
 import pandas as pd
-
-
+from sqlalchemy import exc
+from src.interface_adapters.database.controllers.motor import Motorinterface
 from src.external_interfaces.database.model.motor import (
     LayerRuleAssociation,
     PolicyLayerAssociation,
@@ -12,34 +11,26 @@ from src.external_interfaces.database.model.motor import (
 )
 
 
-
-class Motorinterface(MotorTemplate):
-
-    @abstractclassmethod
-    def get_all_layers(self):
-        raise NotImplementedError('Método não implementado')
-
-
-
-
-class Motor(MotorTemplate):
+class Motor(Motorinterface):
     
-    def get_all_policys(self) -> pd.DataFrame:
+    def get_all_policys(self, status: Literal['active', 'inactive'] = 'active') -> pd.DataFrame:
         with self.dbconn(database_name=self.database) as conn:
-            data = (
+            query = (
                 conn.session.query(
                     Policys.id.label('policy_id'),
                     Policys.name,
                     Policys.description,
                     Policys.identify
                 )
-                .filter(Policys.status == 'active')                
-            ).all()
-        return pd.DataFrame(data)
+                .filter(Policys.status == status)                
+            )
+            columns = [col.get('name') for col in query.column_descriptions]
+            data = query.all()
+        return pd.DataFrame(data, columns=columns)
 
     def get_policys_by_id(self, policys_id: list) -> pd.DataFrame:
         with self.dbconn(database_name=self.database) as conn:
-            data = (
+            query = (
                 conn.session.query(
                     Policys.id.label('policy_id'),
                     Policys.name,
@@ -48,26 +39,30 @@ class Motor(MotorTemplate):
                 )
                 .filter(Policys.status == 'active')                
                 .filter(Policys.id.in_(policys_id))                
-            ).all()
-        return pd.DataFrame(data)
+            )
+            columns = [col.get('name') for col in query.column_descriptions]
+            data = query.all()
+        return pd.DataFrame(data, columns=columns)
 
-    def get_all_layers(self) -> pd.DataFrame:
+    def get_all_layers(self, status: Literal['active', 'inactive'] = 'active') -> pd.DataFrame:
         with self.dbconn(database_name=self.database) as conn:
-            data = (
+            query = (
                 conn.session.query(
                     Layers.id.label('layer_id'),
                     Layers.name,
                     Layers.description,
                     Layers.identify
                 )
-                .filter(Layers.status == 'active')              
+                .filter(Layers.status == status)              
                       
-            ).all()
-        return pd.DataFrame(data)
+            )
+            columns = [col.get('name') for col in query.column_descriptions]
+            data = query.all()
+        return pd.DataFrame(data, columns=columns)
 
     def get_layers_by_id(self, layers_id: list) -> pd.DataFrame:
         with self.dbconn(database_name=self.database) as conn:
-            data = (
+            query = (
                 conn.session.query(
                     Layers.id.label('layer_id'),
                     Layers.name,
@@ -76,52 +71,65 @@ class Motor(MotorTemplate):
                 )
                 .filter(Layers.status == 'active')
                 .filter(Layers.id.in_(layers_id))
-            ).all()
-        return pd.DataFrame(data)
+            )
+            columns = [col.get('name') for col in query.column_descriptions]
+            data = query.all()
+        return pd.DataFrame(data, columns=columns)
 
-    def get_all_rules(self) -> pd.DataFrame:
+    def get_all_rules(self, status: Literal['active', 'inactive'] = 'active') -> pd.DataFrame:
         with self.dbconn(database_name=self.database) as conn:
-            data = (
+            query = (
                 conn.session.query(
                     Rules.id.label('rule_id'),
                     Rules.name,
+                    Rules.code,
                     Rules.description,
-                    Rules.identify
+                    Rules.identify,
+                    Rules.rule
                 )
-                .filter(Rules.status == 'active')                
-            ).all()
-        return pd.DataFrame(data)
+                .filter(Rules.status == status)                
+            )
+            columns = [col.get('name') for col in query.column_descriptions]
+            data = query.all()
+        return pd.DataFrame(data, columns=columns)
 
     def get_rules_by_id(self, rules_id: list) -> pd.DataFrame:
         with self.dbconn(database_name=self.database) as conn:
-            data = (
+            query = (
                 conn.session.query(
                     Rules.id.label('rule_id'),
+                    Rules.name,
                     Rules.code,
                     Rules.description,
-                    Rules.name,
-                    Rules.identify
+                    Rules.identify,
+                    Rules.rule
                 )
                 .filter(Rules.status == 'active')                
                 .filter(Rules.id.in_(rules_id))                
-            ).all()
-        return pd.DataFrame(data)
+            )
+            columns = [col.get('name') for col in query.column_descriptions]
+            data = query.all()
+        return pd.DataFrame(data, columns=columns)
     
-    def get_all_association_rule_to_layer(self) -> pd.DataFrame:
+    def get_all_association_rule_to_layer(self, status: Literal['active', 'inactive'] = 'active') -> pd.DataFrame:
         with self.dbconn(database_name=self.database) as conn:
-            data = (
+            query = (
                 conn.session.query(
                     LayerRuleAssociation.id.label('association_id'),
-                    LayerRuleAssociation.name_layer,
-                    LayerRuleAssociation.name_rule,
+                    Layers.name.label('name_layer'),
+                    Rules.name.label('name_rule'),
                     LayerRuleAssociation.layer_id,
                     LayerRuleAssociation.rule_id,
                     LayerRuleAssociation.action,
                     LayerRuleAssociation.identify
                 )
-                .filter(LayerRuleAssociation.status == 'active')  
-            ).all()
-        return pd.DataFrame(data)
+                .join(Layers, Layers.id==LayerRuleAssociation.layer_id)
+                .join(Rules, Rules.id==LayerRuleAssociation.rule_id)
+                .filter(LayerRuleAssociation.status == status)  
+            )
+            columns = [col.get('name') for col in query.column_descriptions]
+            data = query.all()
+        return pd.DataFrame(data, columns=columns)
   
     def get_association_rule_to_layer_by_id(self, type_id: Literal['association_id', 'layer_id', 'rule_id'], index_ix: list[int]) -> pd.DataFrame:
         column_index = {
@@ -130,36 +138,45 @@ class Motor(MotorTemplate):
         }.get(type_id,  LayerRuleAssociation.id)
 
         with self.dbconn(database_name=self.database) as conn:
-            data = (
+            query = (
                 conn.session.query(
                     LayerRuleAssociation.id.label('association_id'),
-                    LayerRuleAssociation.name_layer,
-                    LayerRuleAssociation.name_rule,
+                    Layers.name.label('name_layer'),
+                    Rules.name.label('name_rule'),
                     LayerRuleAssociation.layer_id,
                     LayerRuleAssociation.rule_id,
                     LayerRuleAssociation.action,
                     LayerRuleAssociation.identify
                 )
+                .join(Layers, Layers.id==LayerRuleAssociation.layer_id)
+                .join(Rules, Rules.id==LayerRuleAssociation.rule_id)
                 .filter(LayerRuleAssociation.status == 'active')
                 .filter(column_index.in_(index_ix))
-            ).all()
-        return pd.DataFrame(data)
+            )
+            columns = [col.get('name') for col in query.column_descriptions]
+            data = query.all()
+        return pd.DataFrame(data, columns=columns)
   
-    def get_all_association_layer_to_police(self) -> pd.DataFrame:
+    def get_all_association_layer_to_police(self, status: Literal['active', 'inactive'] = 'active') -> pd.DataFrame:
+        columns = []
         with self.dbconn(database_name=self.database) as conn:
-            data = (
+            query = (
                 conn.session.query(
                     PolicyLayerAssociation.id.label('association_id'),
-                    PolicyLayerAssociation.name_layer,
-                    PolicyLayerAssociation.name_policy,
+                    Layers.name.label('name_layer'),
+                    Policys.name.label('name_policy'),
                     PolicyLayerAssociation.policy_id,
                     PolicyLayerAssociation.layer_id,
                     PolicyLayerAssociation.priority,
                     PolicyLayerAssociation.identify
                 )
-                .filter(PolicyLayerAssociation.status == 'active')         
-            ).all()
-        return pd.DataFrame(data)
+                .join(Layers, Layers.id==PolicyLayerAssociation.layer_id)
+                .join(Policys, Policys.id==PolicyLayerAssociation.policy_id)
+                .filter(PolicyLayerAssociation.status == status)         
+            )
+            columns = [col.get('name') for col in query.column_descriptions]
+            data = query.all()
+        return pd.DataFrame(data, columns=columns)
     
     def get_association_layer_to_police_by_id(self, type_id: Literal['association_id', 'policy_id', 'layer_id'], index_ix: list[int]) -> pd.DataFrame:
         column_index = {
@@ -168,32 +185,49 @@ class Motor(MotorTemplate):
         }.get(type_id,  PolicyLayerAssociation.id)
         
         with self.dbconn(database_name=self.database) as conn:
-            data = (
+            query = (
                 conn.session.query(
                     PolicyLayerAssociation.id.label('association_id'),
-                    PolicyLayerAssociation.name_layer,
-                    PolicyLayerAssociation.name_policy,
+                    Layers.name.label('name_layer'),
+                    Policys.name.label('name_policy'),
                     PolicyLayerAssociation.policy_id,
                     PolicyLayerAssociation.layer_id,
                     PolicyLayerAssociation.priority,
                     PolicyLayerAssociation.identify
                 )
+                .join(Layers, Layers.id==PolicyLayerAssociation.layer_id)
+                .join(Policys, Policys.id==PolicyLayerAssociation.policy_id)
                 .filter(PolicyLayerAssociation.status == 'active')
                 .filter(column_index.in_(index_ix))
-            ).all()
-        return pd.DataFrame(data)
+            )
+            columns = [col.get('name') for col in query.column_descriptions]
+            data = query.all()
+        return pd.DataFrame(data, columns=columns)
     
-    def add_item(self, name_table: str, data_save: list[dict]) -> None:
-        table = self.get_table(name_table)
-        with self.dbconn(database_name=self.database) as conn:
-            conn.session.bulk_insert_mappings(table, data_save)
-            conn.session.commit()
-
+    def add_item(self, name_table: str, data_save: list[dict]) -> list:
+        try:
+            table = self.get_table(name_table)
+            with self.dbconn(database_name=self.database) as conn:
+                items_save = [table(**params) for params in data_save]
+                conn.session.bulk_save_objects(items_save, return_defaults=True)
+                conn.session.commit()
+                ids_save = [r.id for r in items_save]
+            return ids_save
+        except exc.IntegrityError:
+            raise SyntaxError('Record already exists.')
+        except Exception:
+            raise SyntaxError('Error saving to the database.')
+    
     def update_item(self, name_table: str, data_update: list[dict]):
-        table = self.get_table(name_table)
-        with self.dbconn(database_name=self.database) as conn:
-            conn.session.bulk_update_mappings(table, data_update)
-            conn.session.commit()
+        try:
+            table = self.get_table(name_table)
+            with self.dbconn(database_name=self.database) as conn:
+                conn.session.bulk_update_mappings(table, data_update)
+                conn.session.commit()
+        except exc.IntegrityError:
+            raise SyntaxError('Record already exists.')
+        except Exception:
+            raise SyntaxError('Error saving to the database.')
 
     @classmethod
     def get_table(cls, name_table):

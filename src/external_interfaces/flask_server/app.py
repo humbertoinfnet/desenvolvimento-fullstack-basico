@@ -1,21 +1,8 @@
-"""It creates the flask server with an environment and returns the server"""
-
-from flask import Flask
-
-from src.external_interfaces.flask_server.routers import arxiv_document
-from src.external_interfaces.flask_server.routers import home
-from src.external_interfaces.flask_server.routers.motor import (
-    policys,
-    layers,
-    rules,
-    association
-)
 from src.external_interfaces.flask_server.settings import DevConfig
 
 from flask_openapi3 import OpenAPI, Info
 from flask_cors import CORS
-from flask import redirect
-from urllib.parse import unquote
+from .register_route import register_route
 
 
 def create_app(config_object=DevConfig):
@@ -30,14 +17,9 @@ def create_app(config_object=DevConfig):
     """
 
     info = Info(title="Minha API", version="1.0.0")
-    app = OpenAPI(__name__, info=info)
+    app = OpenAPI(
+        __name__,
+        info=info,
+    )
     CORS(app)
-
-    app.register_api(arxiv_document.blueprint)
-    app.register_api(home.blueprint)
-    app.register_api(policys.blueprint)
-    app.register_api(rules.blueprint)
-    app.register_api(layers.blueprint)
-    app.register_api(association.blueprint)
-
     return app

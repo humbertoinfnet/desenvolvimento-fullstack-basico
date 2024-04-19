@@ -1,83 +1,97 @@
 
-import json
-
-from typing import Optional
-from pydantic import BaseModel, Field
-
-from flask import request, Response
+from flask import request, Response, json
 from flask_openapi3 import Tag, APIBlueprint
 
 from src.external_interfaces.database.controllers.motor import Motor
-from src.interface_adapters.request_arxiv.rest_adapters import request_object as res
+from src.use_cases.motor import MotorConfig, UpdateAssociation
+from src.interface_adapters.schemas.motor.rules import (
+    PathRule,
+    BodyRule,
+    ResponseSuccessRule,
+    ResponseSuccessRuleDelete,
+    ResponseSuccessRuleUpdate,
+    ResponseSuccessRuleAdd
+)
+from src.interface_adapters.schemas.response import (
+    ResponseError,
+    ResponseSuccess,
+    ResponseNoContent
+)
 
 
-tag = Tag(name="Regras", description="Regras")
-blueprint = APIBlueprint('Regras', __name__, abp_tags=[tag], doc_ui=True)
+tag = Tag(name="Regras", description="Rotas para controle das Regras")
+blueprint = APIBlueprint(
+    'Regras',
+    __name__,
+    abp_tags=[tag],
+    doc_ui=True,
+    abp_responses={
+        200: ResponseSuccess,
+        204: ResponseNoContent,
+        500: ResponseError
+    }
+)
 
 
-class BookQuery(BaseModel):
-    type: str
-
-class Path(BaseModel):
-    rule_id: int = Field(..., description='rule id')
-
-class RuleBody(BaseModel):
-    name: Optional[str] = Field(None, description='Nome da regra')
-    code: Optional[str] = Field(None, description='Código da regra')
-    rule: Optional[str] = Field(None, description='Lógica da regra')
-    description: Optional[str] = Field(None, description='Descrição da regra')
-
-
-@blueprint.get('/rules')
+@blueprint.get(
+    '/rules',
+    responses={200: ResponseSuccessRule}
+)
 def get_rules():
     """
     Rota GET para acessar todas as Regras
     """
-
     motor = Motor()
-    rules = motor.get_all_rules().to_dict(orient='records')
-    try:          
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    rules = motor_config.rule.get_rules()
+    return Response(
+        json.dumps(rules, ensure_ascii=False),
+        mimetype="application/json",
+        status=200,
+    )
+
+@blueprint.get(
+    '/rule/<int:rule_id>',
+    responses={200: ResponseSuccessRule}
+)
+def get_rule_by_id(path: PathRule):
+    """
+    Rota GET para acessar as Regras por id
+    """
+    motor = Motor()
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    rules = motor_config.rule.get_rule_by_id(path.rule_id)
+    if len(rules):
         return Response(
             json.dumps(rules, ensure_ascii=False),
             mimetype="application/json",
             status=200,
         )
-        
-    except:
-        return Response(
-            json.dumps({'msg': 'erro'}),
-            mimetype="application/json",
-            status=500,
-        )
-
-@blueprint.get('/rule/<int:rule_id>')
-def get_rule_by_id(path: Path):
-    """
-    Rota GET para acessar as Regras por id
-    """
-    motor = Motor()
-    rule = motor.get_rules_by_id([path.rule_id]).to_dict(orient='records')
     return Response(
-        json.dumps(rule, ensure_ascii=False),
         mimetype="application/json",
-        status=200,
+        status=204,
     )
 
-@blueprint.delete('/rule/<int:rule_id>')
-def delete_rule_by_id(path: Path):
+@blueprint.delete(
+    '/rule/<int:rule_id>',
+    responses={200: ResponseSuccessRuleDelete}
+)
+def delete_rule_by_id(path: PathRule):
     """
     Rota DELETE das Regras por id
     """
     motor = Motor()
-    rule = motor.get_rules_by_id([path.rule_id])
-    if len(rule):
-        data_update = [{'id': path.rule_id, 'status': 'inactive'}]
-        motor.update_item('rules', data_update)
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    deleted = motor_config.rule.delete_rule(path.rule_id)
+    if len(deleted):
         return Response(
             json.dumps(
                 {
-                    'msg': 'Regras deletada com sucesso',
-                    'deleted': rule.to_dict(orient='records')
+                    'message': 'success_deleted',
+                    'deleted': deleted
                 },
                 ensure_ascii=False
             ),
@@ -85,32 +99,29 @@ def delete_rule_by_id(path: Path):
             status=200,
         )
     return Response(
-        json.dumps(
-            {'msg': 'Não existe regra para os parâmetros informados'},
-            ensure_ascii=False
-        ),
         mimetype="application/json",
-        status=422,
+        status=204,
     )
 
-@blueprint.put('/rule/<int:rule_id>')
-def update_rule(path: Path, query: RuleBody):
+@blueprint.put(
+    '/rule/<int:rule_id>',
+    responses={200: ResponseSuccessRuleUpdate}
+)
+def update_rule(path: PathRule, query: BodyRule):
     """
     Rota PUT para atualização de Regra por id
     """
     motor = Motor()
-    previous_rule = motor.get_rules_by_id([path.rule_id])
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    previous_rule, updated_rule = motor_config.rule.update_rule(path.rule_id, query.model_dump())
     if len(previous_rule):
-        data_update = {key: value for key, value in query.model_dump().items() if value is not None}
-        data_update['id'] = path.rule_id
-        motor.update_item('rules', [data_update])
-        updated_rule = motor.get_rules_by_id([path.rule_id])
         return Response(
             json.dumps(
                 {
-                    'msg': 'Regra atualizada com sucesso',
-                    'previous': previous_rule.to_dict(orient='records'),
-                    'updated': updated_rule.to_dict(orient='records')
+                    'message': 'success_updated',
+                    'previous': previous_rule,
+                    'updated': updated_rule
                 },
                 ensure_ascii=False
             ),
@@ -118,28 +129,27 @@ def update_rule(path: Path, query: RuleBody):
             status=200,
         )
     return Response(
-        json.dumps(
-            {'msg': 'Não existe regra para os parâmetros informados'},
-            ensure_ascii=False
-        ),
         mimetype="application/json",
-        status=422,
+        status=204,
     )
 
-@blueprint.post('/rule')
-def add_rule(body: RuleBody):
+@blueprint.post(
+    '/rule',
+    responses={200: ResponseSuccessRuleAdd}
+)
+def add_rule(body: BodyRule):
     """
     Rota POST para adicionar Nova Regra
     """
     motor = Motor()
-    data_save = body.model_dump().copy()
-    data_save['id'] = None
-    motor.add_item('rules', [data_save])
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    rule_create = motor_config.rule.add_rule(body)
     return Response(
         json.dumps(
             {
-                "message": "Regra inserida com sucesso",
-                "rule": body.model_dump()
+                "message": "success_add",
+                "create": rule_create
             }, 
             ensure_ascii=False
         ),
