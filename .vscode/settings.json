@@ -1,0 +1,12 @@
+{
+    "python.analysis.typeCheckingMode": "basic",
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "C:\\Users\\claud\\OneDrive\\Área de Trabalho\\db.sqlite3",
+            "name": "Projeto-PUC-modulo_1"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}
