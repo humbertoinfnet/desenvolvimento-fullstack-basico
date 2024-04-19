@@ -1,5 +1,6 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Enum
+from sqlalchemy import Column, Integer, String, DateTime, Enum, Boolean
+from sqlalchemy.event import listens_for
 
 from src.entities.motor import Policys as PolicysDomainEntity
 from src.external_interfaces.database.model.base import Base
@@ -15,8 +16,3 @@ class Policys(Base):
     status = Column(Enum('active', 'inactive'), default='active', nullable=True)
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
-
-    # def __init__(self, policys_domain: PolicysDomainEntity):
-    #     self.name = policys_domain.name
-    #     self.identify = policys_domain.identify
-    #     self.description = policys_domain.description

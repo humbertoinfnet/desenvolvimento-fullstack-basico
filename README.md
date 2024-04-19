@@ -1,15 +1,14 @@
 # desenvolvimento-fullstack-basico
-Projeto que contempla um projeto para o primeiro modulo da PÓS GRADUAÇÃO de Engenharia de Software da PCU
+- Projeto que contempla o MVP para o primeiro modulo da PÓS GRADUAÇÃO de Engenharia de Software da PCU
+- O MVP pensado nesse modulo é um projeto de cadastro de políticas em um motor de análise de crédito.
+- o projeto consiste em cadastrar, atualizar e desativar regras, políticas e demais componentes
+
 
 # Próximos passos BackEnd
 
-- Tratar os casos quando houver deleção de algum componente, as associações devem ser retiradas
 - Adicionar as verificações na entrada com Field
-- Organizar os Schemas do pydentic
 - Separar as lógicas (schema, use case, Interface do banco, ...)
-
- ## Casos de Segurança
- - quando tentar inserir um cadastro com as mesmas informações de um existente com status inativo, fazer a atualização deste
+- Inserir comentário e anotations em todos os códigos
 
 # Possíveis adiçoes e melhorias
 - Adicionar a tabela com as variáveis

@@ -1,86 +1,98 @@
-import json
-
-from typing import Optional
-from pydantic import BaseModel, Field
-
-from flask import request, Response
+from flask import request, Response, current_app, json
 from flask_openapi3 import Tag, APIBlueprint
 
-from src.interface_adapters.request_arxiv.rest_adapters import request_object as res
 from src.external_interfaces.database.controllers.motor import Motor
+from src.use_cases.motor import MotorConfig, UpdateAssociation
+from src.interface_adapters.schemas.motor.layers import (
+    PathLayer,
+    BodyLayer,
+    ResponseSuccessLayer,
+    ResponseSuccessLayerAdd,
+    ResponseSuccessLayerDelete,
+    ResponseSuccessLayerUpdate
+)
+from src.interface_adapters.schemas.response import (
+    ResponseError,
+    ResponseSuccess,
+    ResponseNoContent
+)
+
+tag = Tag(name="Camadas", description="Rotas para controle das Camadas")
+blueprint = APIBlueprint(
+    'layers',
+    __name__,
+    abp_tags=[tag],
+    doc_ui=True,
+    abp_responses={
+        200: ResponseSuccess,
+        204: ResponseNoContent,
+        500: ResponseError
+    }
+)
 
 
-tag = Tag(name="Camadas", description="Camadas")
-blueprint = APIBlueprint('layers', __name__, abp_tags=[tag], doc_ui=True)
-
-
-class Query(BaseModel):
-    origin_id: int = Field(..., description='origem id')
-    destino_id: int = Field(..., description='destino id')
-
-class BookQuery(BaseModel):
-    type: str
-
-class Path(BaseModel):
-    layer_id: int = Field(..., description='layer id')
-
-class LayerBody(BaseModel):
-    name: Optional[str] = Field(None, description='Nome da camada')
-    description: Optional[str] = Field(None, description='Descrição da camada')    
-
-
-@blueprint.get('/layers')
+@blueprint.get(
+    '/layers',
+    responses={200: ResponseSuccessLayer}
+)
 def get_layers():
     """
     Rota GET para acessar todas as Camadas
     """
+    current_app.logger.info('[route-layers] - acessa a rota GET /layers')
     motor = Motor()
-    layers = motor.get_all_layers().to_dict(orient='records')
-    try:          
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    layers = motor_config.layers.get_layers()
+    return Response(
+        json.dumps(layers, ensure_ascii=False),
+        mimetype="application/json",
+        status=200,
+    )
+
+
+@blueprint.get(
+    '/layer/<int:layer_id>',
+    responses={200: ResponseSuccessLayer}
+)
+def get_layer_by_id(path: PathLayer):
+    """
+    Rota GET para acessar as Camadas por id
+    """
+    current_app.logger.info('[route-layers] - acessa a rota /layers')
+    motor = Motor()
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    layers = motor_config.layers.get_layer_by_id(path.layer_id)
+    if len(layers):
         return Response(
             json.dumps(layers, ensure_ascii=False),
             mimetype="application/json",
             status=200,
         )
-    except:
-        return Response(
-            json.dumps(
-                {
-                    'msg': 'erro',
-                }
-            ),
-            mimetype="application/json",
-            status=500,
-        )
-
-@blueprint.get('/layer/<int:layer_id>')
-def get_layer_by_id(path: Path):
-    """
-    Rota GET para acessar as Camadas por id
-    """
-    motor = Motor()
-    layer = motor.get_layers_by_id([path.layer_id]).to_dict(orient='records')
     return Response(
-        json.dumps(layer, ensure_ascii=False),
         mimetype="application/json",
-        status=200,
+        status=204,
     )
 
-@blueprint.delete('/layer/<int:layer_id>')
-def delete_layer_by_id(path: Path):
+@blueprint.delete(
+    '/layer/<int:layer_id>',
+    responses={200: ResponseSuccessLayerDelete}
+)
+def delete_layer_by_id(path: PathLayer):
     """
     Rota DELETE das Camadas por id
     """
     motor = Motor()
-    layer = motor.get_layers_by_id([path.layer_id])
-    if len(layer):
-        data_update = [{'id': path.layer_id, 'status': 'inactive'}]
-        motor.update_item('layers', data_update)
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    deleted = motor_config.layers.delete_layer(path.layer_id)
+    if len(deleted):
         return Response(
             json.dumps(
                 {
-                    'msg': 'Camada deletada com sucesso',
-                    'deleted': layer.to_dict(orient='records')
+                    'message': 'success_deleted',
+                    'deleted': deleted
                 },
                 ensure_ascii=False
             ),
@@ -88,32 +100,33 @@ def delete_layer_by_id(path: Path):
             status=200,
         )
     return Response(
-        json.dumps(
-            {'msg': 'Não existe camada para os parâmetros informados'},
-            ensure_ascii=False
-        ),
         mimetype="application/json",
-        status=422,
+        status=204,
     )
 
-@blueprint.put('/layer/<int:layer_id>')
-def update_layer(path: Path, query: LayerBody):
+@blueprint.put(
+    '/layer/<int:layer_id>',
+    responses={200: ResponseSuccessLayerUpdate}
+)
+def update_layer(path: PathLayer, query: BodyLayer):
     """
     Rota PUT para atualização de Camada por id
     """
     motor = Motor()
-    previous_layer = motor.get_layers_by_id([path.layer_id])
-    if len(previous_layer):
-        data_update = {key: value for key, value in query.model_dump().items() if value is not None}
-        data_update['id'] = path.layer_id
-        motor.update_item('layers', [data_update])
-        updated_layer = motor.get_layers_by_id([path.layer_id])
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    previous_layers, updated_layers = (
+        motor_config
+        .layers
+        .update_layer(path.layer_id, query.model_dump())
+    )
+    if len(previous_layers):
         return Response(
             json.dumps(
                 {
-                    'msg': 'Camada atualizada com sucesso',
-                    'previous': previous_layer.to_dict(orient='records'),
-                    'updated': updated_layer.to_dict(orient='records')
+                    'message': 'success_updated',
+                    'previous': previous_layers,
+                    'updated': updated_layers
                 },
                 ensure_ascii=False
             ),
@@ -121,27 +134,27 @@ def update_layer(path: Path, query: LayerBody):
             status=200,
         )
     return Response(
-        json.dumps(
-            {'msg': 'Não existe camada para os parâmetros informados'},
-            ensure_ascii=False
-        ),
         mimetype="application/json",
-        status=422,
+        status=204,
     )
 
-@blueprint.post('/layer')
-def add_layer(body: LayerBody):
+@blueprint.post(
+    '/layer',
+    responses={200: ResponseSuccessLayerAdd}
+)
+def add_layer(body: BodyLayer):
     """
     Rota POST para adicionar Nova Camada
     """
     motor = Motor()
-    data_save = body.model_dump().copy()
-    data_save['id'] = None
-    motor.add_item('layers', [data_save])
+    update_association = UpdateAssociation(motor)
+    motor_config = MotorConfig(motor, update_association)
+    layer_create = motor_config.layers.add_layer(body)
     return Response(
         json.dumps(
-            {"message": "Camada inserida com sucesso",
-            "layer": body.model_dump()
+            {
+                "message": "success_add",
+                "create": layer_create
             }, 
             ensure_ascii=False
         ),

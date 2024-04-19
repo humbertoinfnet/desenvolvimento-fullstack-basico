@@ -1,5 +1,7 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Enum
+from sqlalchemy import Column, Integer, String, DateTime, Enum, Boolean
+from sqlalchemy.event import listens_for
+from sqlalchemy.orm import relationship
 
 from src.entities.motor import Layers as LayersDomainEntity
 from src.external_interfaces.database.model.base import Base
@@ -15,8 +17,3 @@ class Layers(Base):
     status = Column(Enum('active', 'inactive'), default='active', nullable=True)
     created_at = Column(DateTime, default=datetime.now(), nullable=True)
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now(), nullable=True)
-
-    # def __init__(self, layers_domain: LayersDomainEntity):
-    #     self.name = layers_domain.name
-    #     self.identify = layers_domain.identify
-    #     self.description = layers_domain.description
