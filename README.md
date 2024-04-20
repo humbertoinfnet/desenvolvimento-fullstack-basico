@@ -8,21 +8,9 @@
 [![PyPI](https://img.shields.io/pypi/pyversions/apache-superset.svg?maxAge=2592000)](https://pypi.python.org/pypi/apache-superset)
 
 
-> Status do Projeto: :heavy_check_mark: :warning: (concluido, em desenvolvimento, etc)
-
-### Tópicos 
-
-:small_blue_diamond: [Descrição do projeto](#descrição-do-projeto)
-
-:small_blue_diamond: [Visão Geral da Solução](#visao-geral-da-solucao)
-
-:small_blue_diamond: [Funcionalidades](#funcionalidades)
-
-:small_blue_diamond: [Pré-requisitos](#pré-requisitos)
+> Status do Projeto: :heavy_check_mark: Concluido
 
 ... 
-
-Insira os tópicos do README em links para facilitar a navegação do leitor
 
 ## Descrição do projeto 
 
@@ -45,24 +33,17 @@ Além disso, foram criados dois elementos auxiliares:
 
 ## Pré-requisitos
 
-- Python 3.11.3
-- pip (gerenciador de pacotes Python)
+:warning: [Python 3.11.3](https://www.python.org/downloads/release/python-3113/)
 
 ## Funcionalidades
 
-:heavy_check_mark: Funcionalidade 1  
+:heavy_check_mark: Políticas: Criação | Edição | Delete | Busca
 
-:heavy_check_mark: Funcionalidade 2  
+:heavy_check_mark: Camadas: Criação | Edição | Delete | Busca
 
-:heavy_check_mark: Funcionalidade 3  
-
-:heavy_check_mark: Funcionalidade 4  
+:heavy_check_mark: Regras: Criação | Edição | Delete | Busca
 
 Se ainda não houver deploy, insira capturas de tela da aplicação ou gifs
-
-## Pré-requisitos
-
-:warning: [Node](https://nodejs.org/en/download/)
 
 No terminal, clone o projeto: 
 
