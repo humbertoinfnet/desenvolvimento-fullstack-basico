@@ -43,8 +43,6 @@ Além disso, foram criados dois elementos auxiliares:
 
 :heavy_check_mark: Regras: Criação | Edição | Delete | Busca
 
-Se ainda não houver deploy, insira capturas de tela da aplicação ou gifs
-
 No terminal, clone o projeto: 
 
 ```bash
