@@ -1,13 +1,13 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Enum, Boolean
-from sqlalchemy.event import listens_for
-from sqlalchemy.orm import relationship
-
-from src.entities.motor import Layers as LayersDomainEntity
+from sqlalchemy import Column, Integer, String, DateTime, Enum
 from src.external_interfaces.database.model.base import Base
 
 
 class Layers(Base):
+    """
+    Classe do sqlalchemy que mapeia a tabela layers em banco
+    """
+    
     __tablename__ = "layers"
 
     id = Column(Integer, primary_key=True, index=True, nullable=False, autoincrement=True)

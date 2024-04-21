@@ -4,7 +4,7 @@ from src.external_interfaces.database.config import DBConnection
 
 class MotorTemplate(ABC):
     """
-    Template method para o banco api_main.
+    Template method para o banco motor.
     """
 
     __name__ = "Motor"

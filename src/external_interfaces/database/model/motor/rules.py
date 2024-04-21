@@ -1,12 +1,13 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Enum, Boolean
-from sqlalchemy.event import listens_for
-
-from src.entities.motor import Rules as RulesDomainEntity
+from sqlalchemy import Column, Integer, String, DateTime, Enum
 from src.external_interfaces.database.model.base import Base
 
 
 class Rules(Base):
+    """
+    Classe do sqlalchemy que mapeia a tabela rules em banco
+    """
+
     __tablename__ = "rules"
 
     id = Column(Integer, primary_key=True, index=True, nullable=False, autoincrement=True)

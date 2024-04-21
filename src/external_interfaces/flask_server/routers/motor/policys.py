@@ -40,7 +40,7 @@ def get_policys():
     Rota GET para acessar todas as Políticas
     """
 
-    current_app.logger.info('[route-layers] - acessa a rota GET /layers')
+    current_app.logger.info('[route-layers] - acessa a rota GET /policys')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -60,7 +60,7 @@ def get_policy_by_id(path: PathPolicy):
     Rota GET para acessar as Politicas por id
     """
 
-    current_app.logger.info('[route-layers] - acessa a rota /layers')
+    current_app.logger.info('[route-layers] - acessa a rota GET /policy/{policy_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -76,6 +76,7 @@ def get_policy_by_id(path: PathPolicy):
         status=204,
     )
 
+
 @blueprint.delete(
     '/policy/<int:policy_id>',
     responses={200: ResponseSuccessPolicyDelete}
@@ -85,6 +86,7 @@ def delete_policy_by_id(path: PathPolicy):
     Rota DELETE das Políticas por id
     """
 
+    current_app.logger.info('[route-layers] - acessa a rota DELETE /policy/{policy_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -115,6 +117,7 @@ def update_policy(path: PathPolicy, query: BodyPolicy):
     Rota PUT para atualização de Politica por id
     """
 
+    current_app.logger.info('[route-layers] - acessa a rota PUT /policy/{policy_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -141,6 +144,7 @@ def update_policy(path: PathPolicy, query: BodyPolicy):
         status=204,
     )
 
+
 @blueprint.post(
     '/policy',
     responses={200: ResponseSuccessPolicyAdd}
@@ -150,6 +154,7 @@ def add_policy(body: BodyPolicy):
     Rota POST para adicionar Nova Politica
     """
 
+    current_app.logger.info('[route-layers] - acessa a rota POST /policy')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)

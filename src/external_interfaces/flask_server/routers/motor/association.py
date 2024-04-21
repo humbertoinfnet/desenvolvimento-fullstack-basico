@@ -1,4 +1,4 @@
-from flask import request, Response, current_app, json
+from flask import Response, current_app, json
 from flask_openapi3 import Tag, APIBlueprint
 
 from src.external_interfaces.database.controllers.motor import Motor
@@ -49,7 +49,7 @@ def get_all_layers_to_policys() -> Response:
     """
     Rota GET para acessar todas as Associações Camadas com Política
     """
-    current_app.logger.info('[route-association] - acessa a rota /associate-layers-to-policys')
+    current_app.logger.info('[route-association] - acessa a rota GET /associate-layers-to-policys')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -70,7 +70,7 @@ def get_layers_to_policys_by_id(path: PathLayersPolicys) -> Response:
     Rota GET para acessar a Associação Camadas com Política por id
     """
 
-    current_app.logger.info('[route-association] - acessa a rota /associate-layers-to-policys')
+    current_app.logger.info('[route-association] - acessa a rota GET /associate-layers-to-policys/{index_id}{type_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -81,6 +81,7 @@ def get_layers_to_policys_by_id(path: PathLayersPolicys) -> Response:
         status=200,
     )
 
+
 @blueprint.delete(
     '/associate-layers-to-policys/<int:association_id>',
     responses={200: ResponseSuccessAssociationLayersPolicysDelete}
@@ -90,7 +91,7 @@ def delete_layers_to_policys(path: PathAssociation) -> Response:
     Rota DELETE da Associação Camadas com Política
     """
 
-    current_app.logger.info('[route-association] - acessa a rota /associate-layers-to-policys')
+    current_app.logger.info('[route-association] - acessa a rota DELETE /associate-layers-to-policys/{association_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -122,7 +123,7 @@ def associate_layers_to_policys(body: BodyAssociationLayersPolicys) -> Response:
     Rota POST para adicionar nova Associação Camadas com Política
     """
 
-    current_app.logger.info('[route-association] - acessa a rota /associate-layers-to-policys')
+    current_app.logger.info('[route-association] - acessa a rota POST /associate-layers-to-policys')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -139,6 +140,7 @@ def associate_layers_to_policys(body: BodyAssociationLayersPolicys) -> Response:
         status=200,
     )
 
+
 @blueprint.post(
     '/associate-layers-to-policys/alter-priority',
     responses={200: ResponseSuccessAssociationLayersPolicysUpdate}
@@ -148,7 +150,7 @@ def alter_priority_layers_to_policys(body: BodyPrioritys) -> Response:
     Rota POST responsável por alterar as prioridades das camadas na Associação Camadas com Política
     """
 
-    current_app.logger.info('[route-association] - acessa a rota /associate-layers-to-policys')
+    current_app.logger.info('[route-association] - acessa a rota POST /associate-layers-to-policys/alter-priority')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -175,7 +177,7 @@ def get_rules_to_layers() -> Response:
     Rota GET para acessar todas as Associações Regras com Camada
     """
 
-    current_app.logger.info('[route-association] - acessa a rota /associate-layers-to-policys')
+    current_app.logger.info('[route-association] - acessa a rota GET /associate-rules-to-layers')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -186,6 +188,7 @@ def get_rules_to_layers() -> Response:
         status=200,
     )
 
+
 @blueprint.get(
     '/associate-rules-to-layers/<int:index_id><string:type_id>',
     responses={200: ResponseSuccessAssociationRulesLayers}
@@ -195,7 +198,7 @@ def get_rules_to_layers_by_id(path: PathRulesLayers) -> Response:
     Rota GET para acessar a Associação Regras com Camada por id
     """
 
-    current_app.logger.info('[route-association] - acessa a rota /associate-layers-to-policys')
+    current_app.logger.info('[route-association] - acessa a rota GET /associate-rules-to-layers/{index_id}{type_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -206,6 +209,7 @@ def get_rules_to_layers_by_id(path: PathRulesLayers) -> Response:
         status=200,
     )
 
+
 @blueprint.delete(
     '/associate-rules-to-layers/<int:association_id>',
     responses={200: ResponseSuccessAssociationRulesLayersDelete}
@@ -215,7 +219,7 @@ def delete_rules_to_layers(path: PathAssociation) -> Response:
     Rota DELETE da Associação Regras com Camada
     """
 
-    current_app.logger.info('[route-association] - acessa a rota /associate-layers-to-policys')
+    current_app.logger.info('[route-association] - acessa a rota DELETE /associate-rules-to-layers/{association_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -237,6 +241,7 @@ def delete_rules_to_layers(path: PathAssociation) -> Response:
         status=204,
     )
 
+
 @blueprint.put(
     '/associate-rules-to-layers/<int:association_id>',
     responses={200: ResponseSuccessAssociationRulesLayersUpdate}
@@ -245,7 +250,8 @@ def update_rules_to_layers(path: PathAssociation, query: QueryUpdateAssociationR
     """
     Rota PUT para alteração da Ação da regra na Associação Regras com Camada
     """
-    current_app.logger.info('[route-association] - acessa a rota /associate-layers-to-policys')
+
+    current_app.logger.info('[route-association] - acessa a rota PUT /associate-rules-to-layers/{association_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -264,6 +270,7 @@ def update_rules_to_layers(path: PathAssociation, query: QueryUpdateAssociationR
         status=200,
     )
 
+
 @blueprint.post(
     '/associate-rules-to-layers',
     responses={200: ResponseSuccessAssociationRulesLayersAdd}
@@ -273,7 +280,7 @@ def associate_rules_to_layers(body: BodyAssociationRulesLayers) -> Response:
     Rota POST para adicionar nova Associação Regras com Camada
     """
 
-    current_app.logger.info('[route-association] - acessa a rota /associate-layers-to-policys')
+    current_app.logger.info('[route-association] - acessa a rota POST /associate-rules-to-layers')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)

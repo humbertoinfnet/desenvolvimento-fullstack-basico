@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from flask import current_app
 from src.interface_adapters.database.controllers.motor import Motorinterface
 from .update_association import UpdateAssociation
 from src.interface_adapters.schemas.motor.policys import (
@@ -8,21 +9,37 @@ from src.interface_adapters.schemas.motor.policys import (
 
 @dataclass
 class Policys:
+    """
+    Método responsável pela lógica envolvendo o elemento de politicas.
+    """
+
     motor: Motorinterface
     update_association: UpdateAssociation
 
     def get_policys(self) -> list:
-        """Obtém todas as regras."""
+        """
+        Método responsável por tratar a requisição da API para buscar todas as políticas.
+        """
+
+        current_app.logger.info('[Policys] - executa metodo get_policys')
         policys = self.motor.get_all_policys().to_dict(orient='records')
         return policys
     
     def get_policy_by_id(self, policy_id: int) -> list:
-        """Obtém uma regra pelo ID."""
+        """
+        Método responsável por tratar a requisição da API para buscar política por id.
+        """
+
+        current_app.logger.info('[Policys] - executa metodo get_policy_by_id')
         policy = self.motor.get_policys_by_id([policy_id]).to_dict(orient='records')
         return policy
     
     def update_policy(self, policy_id: int, values_input: dict) -> tuple:
-        """Atualiza uma regra pelo ID."""
+        """
+        Método responsável por tratar a requisição da API para atualizar política por id.
+        """
+
+        current_app.logger.info('[Policys] - executa metodo update_policy')
         previous_policy = self.motor.get_policys_by_id([policy_id])
         if len(previous_policy):
             data_update = {key: value for key, value in values_input.items() if value is not None}
@@ -33,7 +50,11 @@ class Policys:
         return previous_policy.to_dict(orient='records'), {}
 
     def delete_policy(self, policy_id: int) -> list:
-        """Exclui uma regra pelo ID."""
+        """
+        Método responsável por tratar a requisição da API para excluir política por id.
+        """
+
+        current_app.logger.info('[Policys] - executa metodo delete_policy')
         policy = self.motor.get_policys_by_id([policy_id])
         if len(policy):
             data_update = [{'id': policy_id, 'status': 'inactive'}]
@@ -42,7 +63,11 @@ class Policys:
         return policy.to_dict(orient='records')
 
     def add_policy(self, body: BodyPolicy) -> dict:
-        """Adiciona uma nova regra."""
+        """
+        Método responsável por tratar a requisição da API para adicionar nova política.
+        """
+
+        current_app.logger.info('[Policys] - executa metodo add_policy')
         policys = self.motor.get_all_policys(status='inactive')
         policy_update = policys.query(f'name == "{body.name}"')
         if len(policy_update):

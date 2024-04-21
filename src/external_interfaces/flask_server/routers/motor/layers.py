@@ -35,10 +35,11 @@ blueprint = APIBlueprint(
     '/layers',
     responses={200: ResponseSuccessLayer}
 )
-def get_layers():
+def get_layers() -> Response:
     """
     Rota GET para acessar todas as Camadas
     """
+
     current_app.logger.info('[route-layers] - acessa a rota GET /layers')
     motor = Motor()
     update_association = UpdateAssociation(motor)
@@ -55,11 +56,12 @@ def get_layers():
     '/layer/<int:layer_id>',
     responses={200: ResponseSuccessLayer}
 )
-def get_layer_by_id(path: PathLayer):
+def get_layer_by_id(path: PathLayer) -> Response:
     """
     Rota GET para acessar as Camadas por id
     """
-    current_app.logger.info('[route-layers] - acessa a rota /layers')
+    
+    current_app.logger.info('[route-layers] - acessa a rota GET /layer/{layer_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -75,14 +77,17 @@ def get_layer_by_id(path: PathLayer):
         status=204,
     )
 
+
 @blueprint.delete(
     '/layer/<int:layer_id>',
     responses={200: ResponseSuccessLayerDelete}
 )
-def delete_layer_by_id(path: PathLayer):
+def delete_layer_by_id(path: PathLayer) -> Response:
     """
     Rota DELETE das Camadas por id
     """
+
+    current_app.logger.info('[route-layers] - acessa a rota DELETE /layer/{layer_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -104,14 +109,17 @@ def delete_layer_by_id(path: PathLayer):
         status=204,
     )
 
+
 @blueprint.put(
     '/layer/<int:layer_id>',
     responses={200: ResponseSuccessLayerUpdate}
 )
-def update_layer(path: PathLayer, query: BodyLayer):
+def update_layer(path: PathLayer, query: BodyLayer) -> Response:
     """
     Rota PUT para atualização de Camada por id
     """
+
+    current_app.logger.info('[route-layers] - acessa a rota PUT /layer/{layer_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
@@ -138,14 +146,17 @@ def update_layer(path: PathLayer, query: BodyLayer):
         status=204,
     )
 
+
 @blueprint.post(
     '/layer',
     responses={200: ResponseSuccessLayerAdd}
 )
-def add_layer(body: BodyLayer):
+def add_layer(body: BodyLayer) -> Response:
     """
     Rota POST para adicionar Nova Camada
     """
+
+    current_app.logger.info('[route-layers] - acessa a rota POST /layer')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)

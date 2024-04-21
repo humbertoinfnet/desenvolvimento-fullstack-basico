@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from flask import current_app
 from src.interface_adapters.database.controllers.motor import Motorinterface
 from .update_association import UpdateAssociation
 from src.interface_adapters.schemas.motor.layers import (
@@ -8,21 +9,37 @@ from src.interface_adapters.schemas.motor.layers import (
 
 @dataclass
 class Layers:
+    """
+    Método responsável pela lógica envolvendo o elemento de camadas.
+    """
+
     motor: Motorinterface
     update_association: UpdateAssociation
 
     def get_layers(self) -> list:
-        """Obtém todas as regras."""
+        """
+        Método responsável por tratar a requisição da API para buscar todas as camadas.
+        """
+
+        current_app.logger.info('[Layers] - executa metodo get_layers')
         layers = self.motor.get_all_layers().to_dict(orient='records')
         return layers
     
     def get_layer_by_id(self, layer_id: int) -> list:
-        """Obtém uma regra pelo ID."""
+        """
+        Método responsável por tratar a requisição da API para buscar camada por id.
+        """
+
+        current_app.logger.info('[Layers] - executa metodo get_layer_by_id')
         layer = self.motor.get_layers_by_id([layer_id]).to_dict(orient='records')
         return layer
     
     def update_layer(self, layer_id: int, values_input: dict) -> tuple:
-        """Atualiza uma regra pelo ID."""
+        """
+        Método responsável por tratar a requisição da API para atualizar camada por id.
+        """
+
+        current_app.logger.info('[Layers] - executa metodo update_layer')
         previous_layer = self.motor.get_layers_by_id([layer_id])
         if len(previous_layer):
             data_update = {key: value for key, value in values_input.items() if value is not None}
@@ -33,7 +50,11 @@ class Layers:
         return previous_layer.to_dict(orient='records'), {}
 
     def delete_layer(self, layer_id: int) -> list:
-        """Exclui uma regra pelo ID."""
+        """
+        Método responsável por tratar a requisição da API para excluir camada por id.
+        """
+
+        current_app.logger.info('[Layers] - executa metodo delete_layer')
         layer = self.motor.get_layers_by_id([layer_id])
         if len(layer):
             data_update = [{'id': layer_id, 'status': 'inactive'}]
@@ -43,14 +64,18 @@ class Layers:
         return layer.to_dict(orient='records')
 
     def add_layer(self, body: BodyLayer) -> dict:
-        """Adiciona uma nova regra."""
+        """
+        Método responsável por tratar a requisição da API para adicionar nova camada.
+        """
+
+        current_app.logger.info('[Layers] - executa metodo add_layer')
         layers = self.motor.get_all_layers(status='inactive')
         layer_update = layers.query(f'name == "{body.name}"')
         if len(layer_update):
             layer_update['name'] = body.name
             layer_update['description'] = body.description
             layer_update['status'] = 'active'
-            layer_update.rename(columns={'layer_id':'id'}, inplace=True)
+            layer_update.rename(columns={'layer_id': 'id'}, inplace=True)
             self.motor.update_item('layers', layer_update.to_dict(orient='records'))
             id_save = layer_update['id'].to_list()
         else:
