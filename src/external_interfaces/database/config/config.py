@@ -1,49 +1,33 @@
-"""
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-# Configurações do banco de dados (substitua pelos seus próprios valores)
-DATABASE_URL = "sqlite:///example.db"
-
-# Criar uma instância de engine do SQLAlchemy
-engine = create_engine(DATABASE_URL)
-
-# Criar uma instância de Session do SQLAlchemy
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-"""
-
-
+from flask import current_app
 from sqlalchemy_utils import database_exists, create_database
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+
 import os
-
-
 from src.external_interfaces.database.model.base import Base
-
 from src.external_interfaces.database.controllers.motor import Motor
 
 
-def init_database():
+def init_database() -> None:
+    """Função responsável pela criação inicial do banco de dados
+    """
+    current_app.logger.info('[config_database] - executa funcao init_database')
     db_path = "files/database"
 
     if not os.path.exists(db_path):
-
         os.makedirs(db_path)
 
-
     db_url = 'sqlite:///%s/db.sqlite3' % db_path
-
     engine = create_engine(db_url, echo=False)
-
  
     if not database_exists(engine.url):
-        create_database(engine.url) 
-
+        create_database(engine.url)
 
     Base.metadata.create_all(engine)
 
-def exemple_policys():
+
+def exemple_policys() -> list[dict]:
+    """Registros de exemplos para políticas
+    """
     return [
         {
             "name": "PoliticaCartaoPJ",
@@ -59,7 +43,10 @@ def exemple_policys():
         }
     ]
 
-def exemple_layers():
+
+def exemple_layers() -> list[dict]:
+    """Registros de exemplos para camadas
+    """
     return [
         {
             "name": "camada_sem_custo",
@@ -75,7 +62,10 @@ def exemple_layers():
         }
     ]
 
-def exemple_rules():
+
+def exemple_rules() -> list[dict]:
+    """Registros de exemplos para regras
+    """
     return [
         {
             "name": "REP001-TempoConta",
@@ -97,7 +87,10 @@ def exemple_rules():
         }
     ]
 
-def exemple_rules_to_layers():
+
+def exemple_rules_to_layers() -> list[dict]:
+    """Registros de exemplos para associação entre regras e camadas
+    """
     return [
         {
             "layer_id": 1,
@@ -116,7 +109,10 @@ def exemple_rules_to_layers():
         }
     ]
 
-def exemple_layers_to_policys():
+
+def exemple_layers_to_policys() -> list[dict]:
+    """Registros de exemplos para associação entre camadas e políticas
+    """
     return [
         {
             "policy_id":1,
@@ -135,7 +131,11 @@ def exemple_layers_to_policys():
         }
     ]
 
-def insert_elements():
+
+def insert_elements() -> None:
+    """Função responsável por fazer a inserção inicial em banco com alguns registros de exemplo
+    """
+    current_app.logger.info('[config_database] - executa funcao insert_elements')
     motor = Motor()
     data_insert = {
         'policys': exemple_policys,
@@ -147,5 +147,5 @@ def insert_elements():
     for key, value in data_insert.items():  
         try:
             motor.add_item(key, value())
-        except:
-            pass
+        except Exception as err:
+            current_app.logger.error(f'[config_database] - executa funcao insert_elements - problema: {err}')

@@ -1,5 +1,5 @@
 
-from flask import request, Response, json
+from flask import current_app, Response, json
 from flask_openapi3 import Tag, APIBlueprint
 
 from src.external_interfaces.database.controllers.motor import Motor
@@ -41,15 +41,18 @@ def get_rules():
     """
     Rota GET para acessar todas as Regras
     """
+
+    current_app.logger.info('[route-rules] - acessa a rota GET /rules')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
-    rules = motor_config.rule.get_rules()
+    rules = motor_config.rules.get_rules()
     return Response(
         json.dumps(rules, ensure_ascii=False),
         mimetype="application/json",
         status=200,
     )
+
 
 @blueprint.get(
     '/rule/<int:rule_id>',
@@ -59,10 +62,12 @@ def get_rule_by_id(path: PathRule):
     """
     Rota GET para acessar as Regras por id
     """
+
+    current_app.logger.info('[route-rules] - acessa a rota GET /rule/{rule_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
-    rules = motor_config.rule.get_rule_by_id(path.rule_id)
+    rules = motor_config.rules.get_rule_by_id(path.rule_id)
     if len(rules):
         return Response(
             json.dumps(rules, ensure_ascii=False),
@@ -74,6 +79,7 @@ def get_rule_by_id(path: PathRule):
         status=204,
     )
 
+
 @blueprint.delete(
     '/rule/<int:rule_id>',
     responses={200: ResponseSuccessRuleDelete}
@@ -82,10 +88,12 @@ def delete_rule_by_id(path: PathRule):
     """
     Rota DELETE das Regras por id
     """
+
+    current_app.logger.info('[route-rules] - acessa a rota DELETE /rule/{rule_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
-    deleted = motor_config.rule.delete_rule(path.rule_id)
+    deleted = motor_config.rules.delete_rule(path.rule_id)
     if len(deleted):
         return Response(
             json.dumps(
@@ -111,10 +119,12 @@ def update_rule(path: PathRule, query: BodyRule):
     """
     Rota PUT para atualização de Regra por id
     """
+
+    current_app.logger.info('[route-rules] - acessa a rota PUT /rule/{rule_id}')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
-    previous_rule, updated_rule = motor_config.rule.update_rule(path.rule_id, query.model_dump())
+    previous_rule, updated_rule = motor_config.rules.update_rule(path.rule_id, query.model_dump())
     if len(previous_rule):
         return Response(
             json.dumps(
@@ -133,6 +143,7 @@ def update_rule(path: PathRule, query: BodyRule):
         status=204,
     )
 
+
 @blueprint.post(
     '/rule',
     responses={200: ResponseSuccessRuleAdd}
@@ -141,16 +152,18 @@ def add_rule(body: BodyRule):
     """
     Rota POST para adicionar Nova Regra
     """
+
+    current_app.logger.info('[route-rules] - acessa a rota POST /rule')
     motor = Motor()
     update_association = UpdateAssociation(motor)
     motor_config = MotorConfig(motor, update_association)
-    rule_create = motor_config.rule.add_rule(body)
+    rule_create = motor_config.rules.add_rule(body)
     return Response(
         json.dumps(
             {
                 "message": "success_add",
                 "create": rule_create
-            }, 
+            },
             ensure_ascii=False
         ),
         mimetype="application/json",

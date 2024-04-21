@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from flask import current_app
 from src.interface_adapters.database.controllers.motor import Motorinterface
 from .update_association import UpdateAssociation
 from src.interface_adapters.schemas.motor.rules import (
@@ -7,22 +8,38 @@ from src.interface_adapters.schemas.motor.rules import (
 
 
 @dataclass
-class Rule:
+class Rules:
+    """
+    Método responsável pela lógica envolvendo o elemento de regras.
+    """
+
     motor: Motorinterface
     update_association: UpdateAssociation
 
     def get_rules(self) -> list:
-        """Obtém todas as regras."""
+        """
+        Método responsável por tratar a requisição da API para buscar todas as regras.
+        """
+
+        current_app.logger.info('[Rules] - executa metodo get_rules')
         rules = self.motor.get_all_rules().to_dict(orient='records')
         return rules
     
     def get_rule_by_id(self, rule_id: int) -> list:
-        """Obtém uma regra pelo ID."""
+        """
+        Método responsável por tratar a requisição da API para buscar regra por id.
+        """
+
+        current_app.logger.info('[Rules] - executa metodo get_rule_by_id')
         rule = self.motor.get_rules_by_id([rule_id]).to_dict(orient='records')
         return rule
     
     def update_rule(self, rule_id: int, values_input: dict) -> tuple:
-        """Atualiza uma regra pelo ID."""
+        """
+        Método responsável por tratar a requisição da API para atualizar regra por id.
+        """
+
+        current_app.logger.info('[Rules] - executa metodo update_rule')
         previous_rule = self.motor.get_rules_by_id([rule_id])
         if len(previous_rule):
             data_update = {key: value for key, value in values_input.items() if value is not None}
@@ -33,7 +50,11 @@ class Rule:
         return previous_rule.to_dict(orient='records'), {}
 
     def delete_rule(self, rule_id: int) -> list:
-        """Exclui uma regra pelo ID."""
+        """
+        Método responsável por tratar a requisição da API para excluir regra por id.
+        """
+
+        current_app.logger.info('[Rules] - executa metodo delete_rule')
         rule = self.motor.get_rules_by_id([rule_id])
         if len(rule):
             data_update = [{'id': rule_id, 'status': 'inactive'}]
@@ -42,7 +63,11 @@ class Rule:
         return rule.to_dict(orient='records')
 
     def add_rule(self, body: BodyRule) -> dict:
-        """Adiciona uma nova regra."""
+        """
+        Método responsável por tratar a requisição da API para adicionar nova regra.
+        """
+
+        current_app.logger.info('[Rules] - executa metodo add_rule')
         rules = self.motor.get_all_rules(status='inactive')
         rule_update = rules.query(f'name == "{body.name}"')
         if len(rule_update):
@@ -51,7 +76,7 @@ class Rule:
             rule_update['rule'] = body.rule
             rule_update['description'] = body.description
             rule_update['status'] = 'active'
-            rule_update.rename(columns={'rule_id':'id'}, inplace=True)
+            rule_update.rename(columns={'rule_id': 'id'}, inplace=True)
             self.motor.update_item('rules', rule_update.to_dict(orient='records'))
             id_save = rule_update['id'].to_list()
         else:

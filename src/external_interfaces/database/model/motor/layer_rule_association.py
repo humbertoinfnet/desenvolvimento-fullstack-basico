@@ -1,14 +1,15 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from sqlalchemy import Column, String, Integer, DateTime, Enum, Boolean, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import relationship, backref
-
-from src.entities.motor import Rules as RulesDomainEntity
+from sqlalchemy import Column, String, Integer, DateTime, Enum, ForeignKey, UniqueConstraint
 from src.external_interfaces.database.model.base import Base
 
 
 class LayerRuleAssociation(Base):
+    """
+    Classe do sqlalchemy que mapeia a tabela layer_rule_association em banco
+    """
+    
     __tablename__ = 'layer_rule_association'
 
     id = Column(Integer, primary_key=True, index=True, nullable=False, autoincrement=True)

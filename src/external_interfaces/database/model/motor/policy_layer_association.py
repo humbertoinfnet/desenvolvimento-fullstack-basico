@@ -1,11 +1,13 @@
 from datetime import datetime
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Enum, UniqueConstraint
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.event import listens_for
 from src.external_interfaces.database.model.base import Base
 
 
 class PolicyLayerAssociation(Base):
+    """
+    Classe do sqlalchemy que mapeia a tabela policy_layer_association em banco
+    """
+    
     __tablename__ = 'policy_layer_association'
 
     id = Column(Integer, primary_key=True, index=True, nullable=False, autoincrement=True)
