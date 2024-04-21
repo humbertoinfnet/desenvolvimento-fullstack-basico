@@ -1,6 +1,6 @@
 <h1>Projeto Full-Stack-Basico Back-End</h1> 
 
-- Projeto que contempla o MVP para o primeiro modulo da PÓS GRADUAÇÃO de Engenharia de Software da PCU
+- Projeto que contempla o MVP para o primeiro modulo da PÓS GRADUAÇÃO de Engenharia de Software da PUC
 - O MVP pensado nesse modulo é um projeto de cadastro de políticas em um motor de análise de crédito
 - O projeto consiste em cadastrar, atualizar e desativar regras, políticas e demais componentes
 
