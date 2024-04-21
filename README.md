@@ -22,7 +22,7 @@
 
 Na solução, foram criadas três elementos principais:
 
-- Política
+- Políticas
 - Camadas
 - Regras
 
