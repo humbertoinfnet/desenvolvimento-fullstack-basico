@@ -1,0 +1,362 @@
+{
+    "_default": {
+        "1": {
+            "item": "request_data",
+            "analyses_id": 1,
+            "data": {
+                "status_code": 200,
+                "message": "Success",
+                "data": {
+                    "informacoes_cadastrais": {
+                        "abertura_conta": "2022-08-12",
+                        "categoria_conta": "grande",
+                        "classficacao_conta": "E"
+                    },
+                    "informacoes_transacionais": {
+                        "media_transacoes_tres_meses": 2712.44,
+                        "quantidade_transacoes": 47,
+                        "saldo": 64061.48,
+                        "faturamento": 971786
+                    },
+                    "informacoes_bureau_credito": {
+                        "score_risco": 376,
+                        "pendencia_financeira": 0,
+                        "anotacoes_negativas": 0
+                    },
+                    "informacoes_receita_federal": {
+                        "cnpj": "09089356000118",
+                        "razao_social": "GERENCIANET S.A. - INSTITUICAO DE PAGAMENTO",
+                        "natureza_juridica": "Sociedade An\u00f4nima Fechada",
+                        "qualificacao_responsavel": "Diretor",
+                        "capital_social": 31301696.0,
+                        "porte": "",
+                        "ente_federativo_responsavel": null,
+                        "nome_fantasia": null,
+                        "situacao_cadastral": "Ativa",
+                        "data_situacao_cadastral": "2007-09-27",
+                        "motivo_situacao_cadastral": "SEM MOTIVO",
+                        "nome_da_cidade_no_exterior": null,
+                        "pais": null,
+                        "endereco": {
+                            "tipo_logradouro": "AVENIDA",
+                            "logradouro": "PRESIDENTE JUSCELINO KUBITSCHEK",
+                            "numero": "31",
+                            "complemento": "CONJ  A                   PAVMTO2 E 3",
+                            "bairro": "BAUXITA",
+                            "cep": "35402179",
+                            "uf": "MG",
+                            "municipio": "OURO PRETO"
+                        },
+                        "data_inicio_atividade": "2007-09-27",
+                        "cnae_fiscal_principal": {
+                            "codigo": 6311900,
+                            "nome": "Tratamento de dados, provedores de servi\u00e7os de aplica\u00e7\u00e3o e servi\u00e7os de hospedagem na internet"
+                        },
+                        "cnae_fiscal_secundaria": [
+                            {
+                                "codigo": 4751201,
+                                "nome": "Com\u00e9rcio varejista especializado de equipamentos e suprimentos de inform\u00e1tica"
+                            },
+                            {
+                                "codigo": 6619399,
+                                "nome": "Outras atividades auxiliares dos servi\u00e7os financeiros n\u00e3o especificadas anteriormente"
+                            },
+                            {
+                                "codigo": 7740300,
+                                "nome": "Gest\u00e3o de ativos intang\u00edveis n\u00e3o-financeiros"
+                            }
+                        ],
+                        "telefone1": "1123942208",
+                        "telefone2": "00",
+                        "telefone_fax": "00",
+                        "email": "CORPORATIVO@GERENCIANET.COM.BR",
+                        "situacao_especial": null,
+                        "data_situacao_especial": null,
+                        "socios": [
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "LEONCIO RIVELLI TEIXEIRA NOGUEIRA",
+                                "doc": "***290796**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2011-11-29",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "EVANIL ROSANO DE PAULA",
+                                "doc": "***762676**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2011-11-29",
+                                "pais": "",
+                                "faixa_etaria": "41 a 50 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "DANILO HENRIQUE DE OLIVEIRA",
+                                "doc": "***980526**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2020-11-11",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "ELIANA DE JESUS DE PAULA RIVELLI",
+                                "doc": "***420466**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2011-11-29",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "BRUNO MARCIO FONSECA",
+                                "doc": "***804646**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2022-09-19",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "MARCOS PAULO MAIA NICOLAU",
+                                "doc": "***702996**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2020-11-11",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "PAULO SERGIO DE FARIA BARROS",
+                                "doc": "***035196**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2022-09-19",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            }
+                        ],
+                        "qtde_socios": 7,
+                        "idade_cnpj_dias": 6127,
+                        "provedor_email": "GERENCIANET.COM.BR"
+                    }
+                }
+            }
+        },
+        "2": {
+            "item": "request_data",
+            "analyses_id": 2,
+            "data": {
+                "status_code": 200,
+                "message": "Success",
+                "data": {
+                    "informacoes_cadastrais": {
+                        "abertura_conta": "2022-08-12",
+                        "categoria_conta": "grande",
+                        "classficacao_conta": "E"
+                    },
+                    "informacoes_transacionais": {
+                        "media_transacoes_tres_meses": 2712.44,
+                        "quantidade_transacoes": 47,
+                        "saldo": 64061.48,
+                        "faturamento": 971786
+                    },
+                    "informacoes_bureau_credito": {
+                        "score_risco": 376,
+                        "pendencia_financeira": 0,
+                        "anotacoes_negativas": 0
+                    },
+                    "informacoes_receita_federal": {
+                        "cnpj": "09089356000118",
+                        "razao_social": "GERENCIANET S.A. - INSTITUICAO DE PAGAMENTO",
+                        "natureza_juridica": "Sociedade An\u00f4nima Fechada",
+                        "qualificacao_responsavel": "Diretor",
+                        "capital_social": 31301696.0,
+                        "porte": "",
+                        "ente_federativo_responsavel": null,
+                        "nome_fantasia": null,
+                        "situacao_cadastral": "Ativa",
+                        "data_situacao_cadastral": "2007-09-27",
+                        "motivo_situacao_cadastral": "SEM MOTIVO",
+                        "nome_da_cidade_no_exterior": null,
+                        "pais": null,
+                        "endereco": {
+                            "tipo_logradouro": "AVENIDA",
+                            "logradouro": "PRESIDENTE JUSCELINO KUBITSCHEK",
+                            "numero": "31",
+                            "complemento": "CONJ  A                   PAVMTO2 E 3",
+                            "bairro": "BAUXITA",
+                            "cep": "35402179",
+                            "uf": "MG",
+                            "municipio": "OURO PRETO"
+                        },
+                        "data_inicio_atividade": "2007-09-27",
+                        "cnae_fiscal_principal": {
+                            "codigo": 6311900,
+                            "nome": "Tratamento de dados, provedores de servi\u00e7os de aplica\u00e7\u00e3o e servi\u00e7os de hospedagem na internet"
+                        },
+                        "cnae_fiscal_secundaria": [
+                            {
+                                "codigo": 4751201,
+                                "nome": "Com\u00e9rcio varejista especializado de equipamentos e suprimentos de inform\u00e1tica"
+                            },
+                            {
+                                "codigo": 6619399,
+                                "nome": "Outras atividades auxiliares dos servi\u00e7os financeiros n\u00e3o especificadas anteriormente"
+                            },
+                            {
+                                "codigo": 7740300,
+                                "nome": "Gest\u00e3o de ativos intang\u00edveis n\u00e3o-financeiros"
+                            }
+                        ],
+                        "telefone1": "1123942208",
+                        "telefone2": "00",
+                        "telefone_fax": "00",
+                        "email": "CORPORATIVO@GERENCIANET.COM.BR",
+                        "situacao_especial": null,
+                        "data_situacao_especial": null,
+                        "socios": [
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "LEONCIO RIVELLI TEIXEIRA NOGUEIRA",
+                                "doc": "***290796**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2011-11-29",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "EVANIL ROSANO DE PAULA",
+                                "doc": "***762676**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2011-11-29",
+                                "pais": "",
+                                "faixa_etaria": "41 a 50 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "DANILO HENRIQUE DE OLIVEIRA",
+                                "doc": "***980526**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2020-11-11",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "ELIANA DE JESUS DE PAULA RIVELLI",
+                                "doc": "***420466**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2011-11-29",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "BRUNO MARCIO FONSECA",
+                                "doc": "***804646**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2022-09-19",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "MARCOS PAULO MAIA NICOLAU",
+                                "doc": "***702996**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2020-11-11",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            },
+                            {
+                                "tipo": "Pessoa f\u00edsica",
+                                "nome": "PAULO SERGIO DE FARIA BARROS",
+                                "doc": "***035196**",
+                                "qualificacao": "Diretor",
+                                "data_entrada": "2022-09-19",
+                                "pais": "",
+                                "faixa_etaria": "31 a 40 anos",
+                                "representante_legal": {
+                                    "nome": "",
+                                    "doc": "***000000**",
+                                    "qualificacao": "N\u00e3o informada"
+                                }
+                            }
+                        ],
+                        "qtde_socios": 7,
+                        "idade_cnpj_dias": 6127,
+                        "provedor_email": "GERENCIANET.COM.BR"
+                    }
+                }
+            }
+        }
+    }
+}
