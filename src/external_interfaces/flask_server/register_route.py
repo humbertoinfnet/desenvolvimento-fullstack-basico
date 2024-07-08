@@ -7,6 +7,9 @@ from src.external_interfaces.flask_server.routers.motor import (
     policys,
     rules
 )
+from src.external_interfaces.flask_server.routers.analyses import (
+    analyses
+)
 from src.external_interfaces.flask_server.routers import handler_error
 
 
@@ -20,3 +23,4 @@ def register_route(app: OpenAPI) -> None:
     app.register_api(layers.blueprint)
     app.register_api(association.blueprint)
     app.register_api(handler_error.blueprint)
+    app.register_api(analyses.blueprint)
