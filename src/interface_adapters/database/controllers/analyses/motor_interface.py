@@ -28,3 +28,16 @@ class Motorinterface(MotorTemplate):
             NotImplementedError: função deve ser implementada nas classes que herdam da classe Motorinterface
         """
         raise NotImplementedError('Método não implementado')
+    
+    @abstractmethod
+    def add_item_analyses(self, data_save: list[dict]) -> list:
+        """
+        Método responsável por salvar os dados na tabela Analyses.
+
+        Returns:
+            ids salvos
+
+        Raises:
+            NotImplementedError: função deve ser implementada nas classes que herdam da classe Motorinterface
+        """
+        raise NotImplementedError('Método não implementado')
