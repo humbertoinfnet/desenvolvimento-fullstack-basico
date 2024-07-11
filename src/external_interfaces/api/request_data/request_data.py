@@ -20,8 +20,8 @@ class RequestData(RequestDataInterface):
 
     def params_to_request_api(self):
         self.params = {
-            'url': 'http://localhost:3000/customer-information',
-            'params': self.document
+            'url': 'http://localhost:3001/customer-information',
+            'params': {'document': self.document}
         }
 
     def _request_data(self):

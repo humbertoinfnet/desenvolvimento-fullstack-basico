@@ -28,7 +28,7 @@ blueprint = APIBlueprint(
 
 
 @blueprint.get(
-    '/analyses/<string:document><string:type_policy>',
+    '/analyses/<string:document>/<string:type_policy>',
     responses={200: ResponseSuccess}
 )
 def get_analyses(path: PathAnalyses):

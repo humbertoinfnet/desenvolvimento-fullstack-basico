@@ -27,8 +27,8 @@ class Runner:
         }
         self.save_analyses(data_request, data_response)
         return {
-            'data_response': data_response,
-            'data_request': data_request.get('data')
+            'resposta_analise': data_response,
+            'dados_requisicao': data_request.get('data')
         }
 
     def save_analyses(self, data_request: dict, data_response: dict):
@@ -49,5 +49,6 @@ class Runner:
                 'limit': data_response.get('politica_limite', {}).get('limit_calc', 0),
                 'decision': data_response.get('politica_regras', {}).get('decision'),
                 'analyses_detail_id': id_analyses_detail,
+                'data': data_response
             }
         ]

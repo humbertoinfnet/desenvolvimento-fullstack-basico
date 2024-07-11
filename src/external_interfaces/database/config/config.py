@@ -10,7 +10,6 @@ from src.external_interfaces.database.controllers.motor import Motor
 def init_database() -> None:
     """Função responsável pela criação inicial do banco de dados
     """
-    current_app.logger.info('[config_database] - executa funcao init_database')
     db_path = "files/database"
 
     if not os.path.exists(db_path):
@@ -135,7 +134,7 @@ def exemple_layers_to_policys() -> list[dict]:
 def insert_elements() -> None:
     """Função responsável por fazer a inserção inicial em banco com alguns registros de exemplo
     """
-    current_app.logger.info('[config_database] - executa funcao insert_elements')
+
     motor = Motor()
     data_insert = {
         'policys': exemple_policys,
@@ -148,4 +147,4 @@ def insert_elements() -> None:
         try:
             motor.add_item(key, value())
         except Exception as err:
-            current_app.logger.error(f'[config_database] - executa funcao insert_elements - problema: {err}')
+            print(err)

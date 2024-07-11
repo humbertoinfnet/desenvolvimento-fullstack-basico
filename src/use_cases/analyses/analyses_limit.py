@@ -26,13 +26,13 @@ class AnalysesLimit:
         del data
 
     def application_rule(self):
-        limit_max = self.data.get('faturamento') * 0.01
-        classification, perc_limit = self.matrix(self.data.get('score_risco'))
-        limit_calc = limit_max * perc_limit
+        limit_max = round((self.data.get('faturamento', 0) * 0.01), 2)
+        classification, perc_limit = self.matrix(self.data.get('score_risco', 0))
+        limit_calc = round(limit_max * perc_limit, 2)
         self.response_limit = {
             'limite_max': limit_max,
-            'limit_calc': limit_calc,
-            'classification': classification,
+            'limite_calc': limit_calc,
+            'classificacao': classification,
         }
 
     def matrix(self, score: int):

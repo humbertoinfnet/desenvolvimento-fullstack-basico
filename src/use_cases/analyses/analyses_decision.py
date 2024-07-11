@@ -42,8 +42,8 @@ class AnalysesDecision:
             final_result = self.handle_final_result(decision_layer.get('decisao'), final_result)
 
         self.response_decision = {
-            'decision': final_result,
-            'decision_details': response
+            'decisao': final_result,
+            'decisao_detalhada': response
         }
 
     def decision(self, rules, layer):
@@ -63,7 +63,7 @@ class AnalysesDecision:
                         decisao_rule_pen.append(rule)
             except Exception as err:
                 decisao_rule_error = rule.copy()
-                decisao_rule_error['error_detail'] = str(err)
+                decisao_rule_error['motivo_erro'] = str(err)
                 errors.append(decisao_rule_error)
         layer_result = 'PENDENTE' if len(decisao_rule_pen) > 0 else 'APROVADO'
         layer_result = 'REPROVADO' if len(decisao_rule_rep) > 0 else layer_result

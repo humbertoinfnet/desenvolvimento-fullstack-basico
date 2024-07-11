@@ -13,6 +13,6 @@ if __name__ == '__main__':
     app = create_app()
     register_route(app)
     format_logger()
-    app.run(debug=False)
     init_database()
     insert_elements()
+    app.run(debug=False)
