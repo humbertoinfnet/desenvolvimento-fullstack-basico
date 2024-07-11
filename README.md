@@ -78,7 +78,7 @@ python app.py
 ## Utilizando Docker
 Criando imagem docker:
 ```bash
-# Instalar o virtualenv, se ainda não estiver instalado
+# No diretório raiz do projeto executar o comando
 sudo docker build -t analyses .
 ```
 
