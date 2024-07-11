@@ -50,6 +50,7 @@ No terminal, clone o projeto:
 git clone https://github.com/humbertoinfnet/desenvolvimento-fullstack-basico.git
 ```
 
+## Utilizando VENV
 Recomenda-se o uso de um ambiente virtual (virtualenv) para isolar as dependências do projeto. Para configurar e ativar um ambiente virtual, execute os seguintes comandos no terminal:
 ```bash
 # Instalar o virtualenv, se ainda não estiver instalado
@@ -68,11 +69,24 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Rodando a aplicação: 
+Rodando a aplicação com venv: 
 
 ```bash
-# No diretório raiz do poprojeto executar o comando
+# No diretório raiz do projeto executar o comando
 python app.py
+```
+## Utilizando Docker
+Criando imagem docker:
+```bash
+# Instalar o virtualenv, se ainda não estiver instalado
+sudo docker build -t analyses .
+```
+
+Rodando a aplicação com docker: 
+
+```bash
+# No diretório raiz do projeto executar o comando
+docker run -p 5000:5000 analyses
 ```
 
 ## Estrutura do Projeto
