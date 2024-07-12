@@ -20,7 +20,7 @@
 
 ## Visão Geral da Solução
 
-Na solução, foram criadas três elementos principais:
+Na solução, foram criadas três elementos principais para Política:
 
 - Políticas
 - Camadas
@@ -30,6 +30,16 @@ Além disso, foram criados dois elementos auxiliares:
 
 - Associação de Política com Camada
 - Associação de Camada com Regra
+
+E um endpoint para análise de Crédito, requisitando os dados e aplicando a política configurada nos passos anteriores
+- Analise
+
+## Fluxo Geral do Projeto
+Nesse repositório temos o projeto da componente principal
+As demais componentes estão contidas nos seguintes repositorios:
+- Componente Secundária (front-end): https://github.com/humbertoinfnet/full-stack-basico-front-end
+- Componente Secundária (request-data): https://github.com/humbertoinfnet/request-data
+![image](https://github.com/user-attachments/assets/dd3f41a9-e960-4785-88b8-eed1c038b889)
 
 ## Pré-requisitos
 
