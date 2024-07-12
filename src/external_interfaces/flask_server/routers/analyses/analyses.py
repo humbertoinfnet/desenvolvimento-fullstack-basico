@@ -33,7 +33,7 @@ blueprint = APIBlueprint(
 )
 def get_analyses(path: PathAnalyses):
     """
-    Rota GET para acessar todas as Políticas
+    Rota GET para aplicar a politica de crédito a um documento
     """
 
     current_app.logger.info('[route-layers] - acessa a rota GET /analyses')
