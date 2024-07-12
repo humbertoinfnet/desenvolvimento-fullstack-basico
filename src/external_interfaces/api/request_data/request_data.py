@@ -20,7 +20,7 @@ class RequestData(RequestDataInterface):
         return self.data
 
     def params_to_request_api(self):
-        url_request_data = os.getenv('URL_REQUEST_DATA')
+        url_request_data = os.getenv('URL_REQUEST_DATA', 'http://172.17.0.4:3001')
         self.params = {
             'url': f'{url_request_data}/customer-information',
             'params': {'document': self.document}
