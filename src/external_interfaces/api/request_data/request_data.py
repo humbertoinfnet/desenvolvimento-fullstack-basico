@@ -1,6 +1,7 @@
 import requests
 from dataclasses import dataclass
 from src.interface_adapters.request_data.request_data_interface import RequestDataInterface
+import os
 
 
 @dataclass
@@ -19,8 +20,9 @@ class RequestData(RequestDataInterface):
         return self.data
 
     def params_to_request_api(self):
+        url_request_data = os.getenv('URL_REQUEST_DATA')
         self.params = {
-            'url': 'http://localhost:3001/customer-information',
+            'url': f'{url_request_data}/customer-information',
             'params': {'document': self.document}
         }
 
