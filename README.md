@@ -128,7 +128,8 @@ docker network inspect bridge
 |               | interface_adapters/  |               |                 | Códigos que fazem a interface entre casos de uso e aplicações externas |
 |               | log/                 |               |                 | Configuração dos logs                                                  |
 |               | use_case/            |               |                 | Casos de uso do projeto                                                |
-|               |                      | motor/        |                 | Lógica dos casos de uso relacionados ao motor                          |
+|               |                      | analyses/     |                 | Lógica dos casos de uso relacionados a analise de credito              |
+|               |                      | motor/        |                 | Lógica dos casos de uso relacionados a configuração de política        |
 | app           |                      |               |                 | Arquivos específicos da aplicação principal                            |
 | requirements  |                      |               |                 | Lista de dependências do projeto                                       |
 | gitignore     |                      |               |                 | Arquivo para especificar arquivos e diretórios que devem ser ignorados pelo git |
