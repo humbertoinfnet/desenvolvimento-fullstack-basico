@@ -88,6 +88,16 @@ Rodando a aplicação com docker:
 # No diretório raiz do projeto executar o comando
 docker run -p 5000:5000 analyses
 ```
+## Erro na requisição do request-data:
+
+Configurando env:
+```bash
+# No diretório raiz renomear o arquivo .env_example para .env
+# rodar o projeto request-data e verificar o IP atribuido através do docker
+docker network inspect bridge
+
+# alterar no arquivo env substituindo a URL de acordo com o IP atribuido ao projeto request-data
+```
 
 ## Estrutura do Projeto
 | Diretorio       | Diretorio              | Diretorio       | Diretorio         | Descrição                                                      |  
